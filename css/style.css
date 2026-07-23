@@ -272,6 +272,12 @@ body {
   width: 100%;
   height: 100%;
   display: block;
+  /* on mobile .ptz-desk's aspect-ratio is narrower than the photo's native
+     16:9-ish shape (see below), so this crops the sides instead of
+     stretching -- ptz.js's layout() accounts for the resulting crop when
+     positioning the monitor/joystick/zoom hotspots */
+  object-fit: cover;
+  object-position: center;
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
@@ -414,6 +420,14 @@ body {
 
   .projects-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ptz-desk {
+    /* narrower than the photo's native ~16:9 shape -- object-fit:cover
+       crops the sides instead of shrinking the whole (wide) scene down,
+       so the monitor/joystick/zoom read much bigger on a narrow screen */
+    aspect-ratio: 3 / 4;
+    width: min(100vw, calc(85vh * 0.75));
   }
 }
 

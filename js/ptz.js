@@ -4,6 +4,7 @@
 
 	// hotspot coordinates measured against the source photo's natural pixel size (1672x941)
 	var NATURAL_W = 1672;
+	var NATURAL_H = 941;
 	var SCREEN = { left: 305, top: 54, right: 1108, bottom: 504 };
 	var JOYSTICK_CENTER = { x: 828, y: 585 };
 	var JOYSTICK_MAX_RADIUS = 45; // px, natural scale -- how far the nub can travel before clamping
@@ -17,7 +18,8 @@
 	var zoomHit = document.getElementById("ptzZoomHit");
 	var glow = joystickHit.querySelector(".ptz-joystick-glow");
 
-	var scale = 1; // rendered-px per natural-px, recalculated on layout
+	var scale = 1; // effective rendered-px per natural-px (object-fit:cover scale)
+	var offsetX = 0, offsetY = 0; // crop offset when the container's aspect ratio is narrower/wider than the photo's
 	var joystickMaxRadiusPx = JOYSTICK_MAX_RADIUS;
 	var zoomMaxRangePx = ZOOM_MAX_RANGE;
 
@@ -25,24 +27,35 @@
 		// the PTZ tab is display:none until active, so clientWidth reads 0 --
 		// bail out rather than positioning everything at scale 0
 		if (!deskScene.clientWidth) return;
-		scale = deskScene.clientWidth / NATURAL_W;
+		var containerW = deskScene.clientWidth;
+		var containerH = deskScene.clientHeight;
 
-		monitor.style.left = SCREEN.left * scale + "px";
-		monitor.style.top = SCREEN.top * scale + "px";
+		// same math as CSS object-fit:cover: scale by whichever dimension
+		// needs MORE scaling to fully cover the container, which crops the
+		// other dimension. On mobile .ptz-desk is narrower than the photo's
+		// native ~16:9 shape, so this crops the sides (see the media query).
+		// When the container's aspect ratio matches the photo's exactly
+		// (desktop), offsetX/offsetY come out to 0 -- same as before.
+		scale = Math.max(containerW / NATURAL_W, containerH / NATURAL_H);
+		offsetX = (NATURAL_W * scale - containerW) / 2;
+		offsetY = (NATURAL_H * scale - containerH) / 2;
+
+		monitor.style.left = SCREEN.left * scale - offsetX + "px";
+		monitor.style.top = SCREEN.top * scale - offsetY + "px";
 		monitor.style.width = (SCREEN.right - SCREEN.left) * scale + "px";
 		monitor.style.height = (SCREEN.bottom - SCREEN.top) * scale + "px";
 
 		var hitPad = 1.35; // hit area a bit larger than the visible knob for easier grabbing
 		var rPx = JOYSTICK_MAX_RADIUS * scale * hitPad;
-		joystickHit.style.left = JOYSTICK_CENTER.x * scale - rPx + "px";
-		joystickHit.style.top = JOYSTICK_CENTER.y * scale - rPx + "px";
+		joystickHit.style.left = JOYSTICK_CENTER.x * scale - offsetX - rPx + "px";
+		joystickHit.style.top = JOYSTICK_CENTER.y * scale - offsetY - rPx + "px";
 		joystickHit.style.width = rPx * 2 + "px";
 		joystickHit.style.height = rPx * 2 + "px";
 		joystickMaxRadiusPx = JOYSTICK_MAX_RADIUS * scale;
 
 		var zoomPad = 18; // natural px -- bigger forgiving touch target than the visible wheel
-		zoomHit.style.left = (ZOOM_BOX.left - zoomPad) * scale + "px";
-		zoomHit.style.top = (ZOOM_BOX.top - zoomPad) * scale + "px";
+		zoomHit.style.left = (ZOOM_BOX.left - zoomPad) * scale - offsetX + "px";
+		zoomHit.style.top = (ZOOM_BOX.top - zoomPad) * scale - offsetY + "px";
 		zoomHit.style.width = (ZOOM_BOX.right - ZOOM_BOX.left + zoomPad * 2) * scale + "px";
 		zoomHit.style.height = (ZOOM_BOX.bottom - ZOOM_BOX.top + zoomPad * 2) * scale + "px";
 		zoomMaxRangePx = ZOOM_MAX_RANGE * scale;
