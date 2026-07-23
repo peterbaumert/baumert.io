@@ -1,22 +1,27 @@
 function currentTime() {
-    var date = new Date(); /* creating object of Date class */
-    document.getElementById("time").innerText = date.toLocaleTimeString(); /* adding time to the div */
-    document.getElementById("date").innerText = date.toLocaleDateString(); /* adding date to the div */
-    var t = setTimeout(function () { currentTime() }, 1000); /* setting timer */
+	var date = new Date();
+	document.getElementById("time").innerText = date.toLocaleTimeString();
+	document.getElementById("date").innerText = date.toLocaleDateString();
 }
 
-currentTime(); /* calling currentTime() function to initiate the process */
+setInterval(currentTime, 1000);
+currentTime();
 
+document.addEventListener("DOMContentLoaded", function () {
+	var tabs = document.querySelectorAll("#windows .tab");
+	var screens = document.querySelectorAll(".screen");
 
-$(document).ready(function () {
+	tabs.forEach(function (tab) {
+		tab.addEventListener("click", function (e) {
+			e.preventDefault();
+			var target = tab.getAttribute("data-tab");
 
-    $('#footer a').click((e) => {
-        $('#footer a').removeClass('active');
-        $(e.target).addClass('active');
-    });
-    if (window.location.hash != "") {
-        $('#footer a').removeClass('active');
-        $('#footer a[href="'+window.location.hash+'"]').addClass('active');
-    }
+			tabs.forEach(function (t) { t.classList.remove("active"); });
+			tab.classList.add("active");
 
+			screens.forEach(function (screen) {
+				screen.classList.toggle("active", screen.id === target);
+			});
+		});
+	});
 });
