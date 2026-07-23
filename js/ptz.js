@@ -10,6 +10,13 @@
 	var JOYSTICK_MAX_RADIUS = 45; // px, natural scale -- how far the nub can travel before clamping
 	var ZOOM_BOX = { left: 977, top: 663, right: 1050, bottom: 763 };
 	var ZOOM_MAX_RANGE = 40; // px, natural scale -- vertical drag range for full-speed zoom
+	// must match .ptz-desk-photo's object-position in CSS -- 0 = crop window
+	// anchored to the photo's left edge, 1 = anchored to its right edge,
+	// 0.5 = centered. The interactive content sits well left of the photo's
+	// true geometric center, so a centered crop cuts into the monitor itself
+	// on narrow (cropped) aspect ratios; this shifts the anchor left instead.
+	var OBJECT_POSITION_X = 0.33;
+	var OBJECT_POSITION_Y = 0.5;
 
 	var deskPhoto = document.getElementById("ptzDeskPhoto");
 	var monitor = document.getElementById("ptzMonitor");
@@ -37,8 +44,8 @@
 		// When the container's aspect ratio matches the photo's exactly
 		// (desktop), offsetX/offsetY come out to 0 -- same as before.
 		scale = Math.max(containerW / NATURAL_W, containerH / NATURAL_H);
-		offsetX = (NATURAL_W * scale - containerW) / 2;
-		offsetY = (NATURAL_H * scale - containerH) / 2;
+		offsetX = (NATURAL_W * scale - containerW) * OBJECT_POSITION_X;
+		offsetY = (NATURAL_H * scale - containerH) * OBJECT_POSITION_Y;
 
 		monitor.style.left = SCREEN.left * scale - offsetX + "px";
 		monitor.style.top = SCREEN.top * scale - offsetY + "px";

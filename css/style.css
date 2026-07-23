@@ -28,6 +28,13 @@
 html,
 body {
   height: 100%;
+  /* safety net for the PTZ scene's full-bleed layout: iOS Safari's 100vw
+     can be a few px wider than the true visible viewport (it doesn't
+     account for viewport quirks the way 100% does), which lets the page
+     scroll horizontally by that sliver and cuts off one edge of the
+     full-bleed content. Disallowing horizontal scroll entirely means any
+     such overflow just clips invisibly instead of shifting the viewport. */
+  overflow-x: hidden;
 }
 
 body {
@@ -275,9 +282,14 @@ body {
   /* on mobile .ptz-desk's aspect-ratio is narrower than the photo's native
      16:9-ish shape (see below), so this crops the sides instead of
      stretching -- ptz.js's layout() accounts for the resulting crop when
-     positioning the monitor/joystick/zoom hotspots */
+     positioning the monitor/joystick/zoom hotspots.
+     33% (not 50%/center): the photo's own content isn't centered in the
+     frame -- the monitor+joystick+zoom sit well left of the photo's true
+     geometric center (there's a lot of empty space to the right, past the
+     second monitor). A centered crop cuts into the monitor's left edge;
+     this constant MUST match OBJECT_POSITION_X in ptz.js. */
   object-fit: cover;
-  object-position: center;
+  object-position: 33% center;
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
@@ -425,9 +437,14 @@ body {
   .ptz-desk {
     /* narrower than the photo's native ~16:9 shape -- object-fit:cover
        crops the sides instead of shrinking the whole (wide) scene down,
-       so the monitor/joystick/zoom read much bigger on a narrow screen */
-    aspect-ratio: 3 / 4;
-    width: min(100vw, calc(85vh * 0.75));
+       so the monitor/joystick/zoom read much bigger on a narrow screen.
+       1:1 (not narrower) -- the photo's own content isn't centered in the
+       frame (there's much more empty space on the right than the left),
+       so a tighter ratio here cuts into the monitor itself; verified with
+       the actual measured SCREEN bounds that 1:1 + the object-position
+       shift below leaves real margin on both sides. */
+    aspect-ratio: 1 / 1;
+    width: min(100vw, calc(85vh * 1));
   }
 }
 
