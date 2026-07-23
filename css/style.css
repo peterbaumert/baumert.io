@@ -1,0 +1,136 @@
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0px;
+  background-color: black;
+}
+
+.content {
+  flex: 1 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.content,
+.content:target ~ #home {
+  display: none;
+}
+#home,
+.content:target {
+  display: flex;
+}
+
+#impressum {
+    color: darkgreen;
+}
+
+table {
+  width: initial !important;
+}
+
+#home pre {
+  font-size: 1.5vw;
+  font-family: "Courier New", Monospace;
+  white-space: pre;
+  letter-spacing: -1px;
+  line-height: calc(1.5vw - 1px);
+  color: crimson;
+}
+
+#footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  background-color: rgb(44, 44, 44);
+  padding-bottom: 3px;
+  color: white;
+  font-size: 1.5em;
+  font-family: "Courier New", Monospace;
+}
+
+#footer div {
+  display: inline;
+}
+
+#footer a {
+    color: lightgrey;
+    text-decoration: none;
+}
+
+#footer > div {
+  --padding: 15px;
+  text-align: center;
+  padding-left: var(--padding);
+  padding-right: var(--padding);
+  position: relative;
+}
+
+#footer > div::before {
+  content: "[";
+  color: white;
+  position: absolute;
+  left: 0;
+}
+
+#footer > div::after {
+  content: "]";
+  color: white;
+  position: absolute;
+  right: 0;
+}
+
+#hostname {
+  color: darkmagenta;
+  font-weight: bold;
+}
+
+#session {
+  color: darkgreen;
+  font-weight: bold;
+}
+
+#speed {
+  color: orange;
+}
+
+#date {
+  color: orange;
+  padding-right: 0px;
+}
+
+#time {
+  color: darkgreen;
+  padding-left: 5px;
+  font-weight: bold;
+}
+
+#windows {
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+#windows div {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+#windows .active::before {
+  content: "(";
+  color: red;
+}
+
+#windows .active::after {
+  content: ")";
+  color: red;
+}
+
+#windows .active {
+  color: darkgreen;
+  font-weight: 600;
+}
