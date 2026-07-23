@@ -51,7 +51,7 @@ body {
   max-width: 1280px;
   width: 100%;
   margin: 0 auto;
-  padding: 64px 56px;
+  padding: 64px 56px 80px;
 }
 
 .screen {
@@ -198,7 +198,9 @@ body {
 
 /* Footer / nav bar */
 #footer {
-  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
   background: #1a1a1a;
   color: #d3d3d3;
   font-family: "JetBrains Mono", monospace;
@@ -242,4 +244,42 @@ body {
 #time {
   color: var(--color-green);
   font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+  .content {
+    padding: 32px 24px 80px;
+  }
+
+  .home-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .name {
+    font-size: 28px;
+  }
+
+  .content {
+    padding-bottom: 100px;
+  }
+
+  #footer {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding: 8px 16px;
+  }
+
+  #windows {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
 }
