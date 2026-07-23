@@ -249,10 +249,14 @@ body {
 /* PTZ */
 .ptz-desk {
   position: relative;
-  width: min(1000px, 100%);
+  /* break out of .content's padded/centered column to fill (almost) the
+     full viewport width, capped so it doesn't get absurd on ultra-wide
+     screens or exceed a reasonable viewport height on short ones */
+  width: min(100vw, 1600px, calc(85vh * 1.7768));
   aspect-ratio: 1672 / 941;
   touch-action: none;
-  margin: 0 auto;
+  margin-left: 50%;
+  transform: translateX(-50%);
 }
 
 .ptz-desk-photo {
