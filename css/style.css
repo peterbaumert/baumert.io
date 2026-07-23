@@ -243,3 +243,37 @@ body {
   color: var(--color-green);
   font-weight: bold;
 }
+
+/* Responsive */
+@media (max-width: 800px) {
+  .content {
+    padding: 32px 24px;
+  }
+
+  .home-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .name {
+    font-size: 28px;
+  }
+
+  #footer {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding: 8px 16px;
+  }
+
+  #windows {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+}
