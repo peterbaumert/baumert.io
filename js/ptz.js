@@ -56,28 +56,51 @@
 	var PAN_MAX_SPEED = 9; // px per frame at full deflection
 	var ZOOM_SPEED = 0.012; // per frame
 
+	// once zoomed out far enough that the field is smaller than the monitor
+	// viewport, there's only one sensible position: centered. Used by BOTH
+	// pan and zoom, continuously, so it's never left off-center waiting for
+	// the next pan touch to suddenly snap it into place.
+	function centerIfSmallerThanMonitor() {
+		var fieldW = field.offsetWidth * state.scale;
+		var fieldH = field.offsetHeight * state.scale;
+		var monW = monitor.clientWidth;
+		var monH = monitor.clientHeight;
+		// ease toward centered rather than snapping instantly -- the field
+		// can cross from "bigger than the monitor" to "smaller" in a single
+		// zoom frame, and jumping straight to the centered value right at
+		// that frame looked like a sudden pan. Closing the gap gradually
+		// over a few frames instead makes it read as a smooth settle.
+		var ease = 0.08;
+		if (fieldW <= monW) {
+			var targetX = (monW - fieldW) / 2;
+			state.x += (targetX - state.x) * ease;
+		}
+		if (fieldH <= monH) {
+			var targetY = (monH - fieldH) / 2;
+			state.y += (targetY - state.y) * ease;
+		}
+	}
+
+	// full pan clamp: stay within the field's edges. Only used by actual
+	// pan operations (joystick, direct drag) -- zoom does NOT clamp to
+	// edges (a real camera doesn't reposition itself when you zoom, only
+	// pan/tilt does; re-clamping every zoom frame fought the zoom's own
+	// center-lock recentering and looked like the camera panning on its
+	// own), but it DOES still get centerIfSmallerThanMonitor so it never
+	// ends up sitting off-center once the whole field fits in view.
 	function clampPan() {
+		centerIfSmallerThanMonitor();
+
 		var fieldW = field.offsetWidth * state.scale;
 		var fieldH = field.offsetHeight * state.scale;
 		var monW = monitor.clientWidth;
 		var monH = monitor.clientHeight;
 
-		// once zoomed out far enough that the field is smaller than the
-		// monitor viewport, center it instead of clamping to (0,0) -- the
-		// old clamp forced a hard snap to the top-left corner right at the
-		// zoom-out limit, which looked like the camera panning/tilting on
-		// its own. This is continuous with the clamped case exactly at the
-		// point fieldW/fieldH crosses monW/monH, so there's no jump.
-		if (fieldW <= monW) {
-			state.x = (monW - fieldW) / 2;
-		} else {
+		if (fieldW > monW) {
 			var minX = monW - fieldW;
 			state.x = Math.max(minX, Math.min(0, state.x));
 		}
-
-		if (fieldH <= monH) {
-			state.y = (monH - fieldH) / 2;
-		} else {
+		if (fieldH > monH) {
 			var minY = monH - fieldH;
 			state.y = Math.max(minY, Math.min(0, state.y));
 		}
@@ -179,9 +202,15 @@
 				state.x = cx - ratio * (cx - state.x);
 				state.y = cy - ratio * (cy - state.y);
 				state.scale = newScale;
-				applyTransform();
 			}
 		}
+		// runs every frame regardless of whether scale is still changing --
+		// once scale hits SCALE_MIN, newScale===oldScale forever, and if this
+		// were nested inside that check the easing toward center would just
+		// freeze wherever it happened to be the instant the floor was hit,
+		// never actually finishing even if the drag is held well past that.
+		centerIfSmallerThanMonitor();
+		applyTransform();
 		zoomRafId = requestAnimationFrame(zoomLoop);
 	}
 
