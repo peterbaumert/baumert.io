@@ -377,29 +377,23 @@ body {
 
 .ptz-zoom-hit {
   position: absolute;
-  display: flex;
-  flex-direction: column;
   border-radius: 8px;
-  overflow: hidden;
   touch-action: none;
+  cursor: ns-resize;
 }
 
-.ptz-zoom-half {
-  flex: 1;
-  background: rgba(255, 255, 255, 0);
-  transition: background 0.1s;
-}
-
-.ptz-zoom-half:first-child {
-  cursor: n-resize;
-}
-
-.ptz-zoom-half:last-child {
-  cursor: s-resize;
-}
-
-.ptz-zoom-half.active {
+.ptz-zoom-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
   background: rgba(57, 211, 83, 0.35);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.ptz-zoom-hit.dragging .ptz-zoom-glow {
+  opacity: 1;
 }
 
 /* Responsive */

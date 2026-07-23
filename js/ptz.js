@@ -8,18 +8,18 @@
 	var JOYSTICK_CENTER = { x: 828, y: 585 };
 	var JOYSTICK_MAX_RADIUS = 45; // px, natural scale -- how far the nub can travel before clamping
 	var ZOOM_BOX = { left: 977, top: 663, right: 1050, bottom: 763 };
+	var ZOOM_MAX_RANGE = 40; // px, natural scale -- vertical drag range for full-speed zoom
 
 	var deskPhoto = document.getElementById("ptzDeskPhoto");
 	var monitor = document.getElementById("ptzMonitor");
 	var field = document.getElementById("ptzField");
 	var joystickHit = document.getElementById("ptzJoystickHit");
 	var zoomHit = document.getElementById("ptzZoomHit");
-	var zoomIn = document.getElementById("ptzZoomIn");
-	var zoomOut = document.getElementById("ptzZoomOut");
 	var glow = joystickHit.querySelector(".ptz-joystick-glow");
 
 	var scale = 1; // rendered-px per natural-px, recalculated on layout
 	var joystickMaxRadiusPx = JOYSTICK_MAX_RADIUS;
+	var zoomMaxRangePx = ZOOM_MAX_RANGE;
 
 	function layout() {
 		// the PTZ tab is display:none until active, so clientWidth reads 0 --
@@ -45,6 +45,7 @@
 		zoomHit.style.top = (ZOOM_BOX.top - zoomPad) * scale + "px";
 		zoomHit.style.width = (ZOOM_BOX.right - ZOOM_BOX.left + zoomPad * 2) * scale + "px";
 		zoomHit.style.height = (ZOOM_BOX.bottom - ZOOM_BOX.top + zoomPad * 2) * scale + "px";
+		zoomMaxRangePx = ZOOM_MAX_RANGE * scale;
 
 		clampPan();
 		applyTransform();
@@ -130,40 +131,60 @@
 	joystickHit.addEventListener("pointerup", releaseJoystick);
 	joystickHit.addEventListener("pointercancel", releaseJoystick);
 
-	// --- zoom rocker: hold to zoom, pivoting around the viewport center ---
-	var zoomDir = 0;
+	// --- zoom: analog drag, same pattern as the joystick but vertical-only.
+	// Drag up = zoom in, drag down = zoom out, further = faster, pivoting
+	// around the viewport center so it feels like a straight dolly in/out.
+	var zoomActive = false;
 	var zoomRafId = null;
+	var zoomOffset = 0; // vertical drag offset, clamped to +-zoomMaxRangePx
+	var zoomStartY = 0;
+
 	function zoomLoop() {
-		if (zoomDir === 0) return;
-		var oldScale = state.scale;
-		var newScale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, oldScale + zoomDir * ZOOM_SPEED));
-		if (newScale !== oldScale) {
-			var cx = monitor.clientWidth / 2;
-			var cy = monitor.clientHeight / 2;
-			var ratio = newScale / oldScale;
-			state.x = cx - ratio * (cx - state.x);
-			state.y = cy - ratio * (cy - state.y);
-			state.scale = newScale;
-			applyTransform();
+		if (!zoomActive) return;
+		var mag = Math.abs(zoomOffset) / zoomMaxRangePx;
+		if (mag > 0.02) {
+			var dir = zoomOffset < 0 ? 1 : -1; // dragging up (negative offset) zooms in
+			var speed = ZOOM_SPEED * mag * mag;
+			var oldScale = state.scale;
+			var newScale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, oldScale + dir * speed));
+			if (newScale !== oldScale) {
+				var cx = monitor.clientWidth / 2;
+				var cy = monitor.clientHeight / 2;
+				var ratio = newScale / oldScale;
+				state.x = cx - ratio * (cx - state.x);
+				state.y = cy - ratio * (cy - state.y);
+				state.scale = newScale;
+				applyTransform();
+			}
 		}
 		zoomRafId = requestAnimationFrame(zoomLoop);
 	}
-	function startZoom(dir, el) {
-		zoomDir = dir;
-		el.classList.add("active");
-		zoomRafId = requestAnimationFrame(zoomLoop);
+
+	function setZoomOffset(dy) {
+		zoomOffset = Math.max(-zoomMaxRangePx, Math.min(zoomMaxRangePx, dy));
 	}
-	function stopZoom(el) {
-		zoomDir = 0;
-		el.classList.remove("active");
+
+	zoomHit.addEventListener("pointerdown", function (e) {
+		zoomHit.setPointerCapture(e.pointerId);
+		zoomActive = true;
+		zoomHit.classList.add("dragging");
+		zoomStartY = e.clientY;
+		setZoomOffset(0);
+		zoomRafId = requestAnimationFrame(zoomLoop);
+	});
+	zoomHit.addEventListener("pointermove", function (e) {
+		if (!zoomActive) return;
+		setZoomOffset(e.clientY - zoomStartY);
+	});
+	function releaseZoom() {
+		if (!zoomActive) return;
+		zoomActive = false;
+		zoomHit.classList.remove("dragging");
+		setZoomOffset(0);
 		if (zoomRafId) cancelAnimationFrame(zoomRafId);
 	}
-	zoomIn.addEventListener("pointerdown", function (e) { zoomIn.setPointerCapture(e.pointerId); startZoom(1, zoomIn); });
-	zoomIn.addEventListener("pointerup", function () { stopZoom(zoomIn); });
-	zoomIn.addEventListener("pointercancel", function () { stopZoom(zoomIn); });
-	zoomOut.addEventListener("pointerdown", function (e) { zoomOut.setPointerCapture(e.pointerId); startZoom(-1, zoomOut); });
-	zoomOut.addEventListener("pointerup", function () { stopZoom(zoomOut); });
-	zoomOut.addEventListener("pointercancel", function () { stopZoom(zoomOut); });
+	zoomHit.addEventListener("pointerup", releaseZoom);
+	zoomHit.addEventListener("pointercancel", releaseZoom);
 
 	// --- fallback: direct drag on the monitor screen ---
 	var dragActive = false;
