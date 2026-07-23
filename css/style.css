@@ -51,7 +51,7 @@ body {
   max-width: 1280px;
   width: 100%;
   margin: 0 auto;
-  padding: 64px 56px;
+  padding: 64px 56px 104px;
 }
 
 .screen {
@@ -198,7 +198,11 @@ body {
 
 /* Footer / nav bar */
 #footer {
-  flex-shrink: 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
   background: #1a1a1a;
   color: #d3d3d3;
   font-family: "JetBrains Mono", monospace;
@@ -247,7 +251,7 @@ body {
 /* Responsive */
 @media (max-width: 800px) {
   .content {
-    padding: 32px 24px;
+    padding: 32px 24px 104px;
   }
 
   .home-grid {
@@ -263,6 +267,10 @@ body {
 @media (max-width: 480px) {
   .name {
     font-size: 28px;
+  }
+
+  .content {
+    padding-bottom: 140px;
   }
 
   #footer {
