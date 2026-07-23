@@ -61,10 +61,26 @@
 		var fieldH = field.offsetHeight * state.scale;
 		var monW = monitor.clientWidth;
 		var monH = monitor.clientHeight;
-		var minX = Math.min(0, monW - fieldW);
-		var minY = Math.min(0, monH - fieldH);
-		state.x = Math.max(minX, Math.min(0, state.x));
-		state.y = Math.max(minY, Math.min(0, state.y));
+
+		// once zoomed out far enough that the field is smaller than the
+		// monitor viewport, center it instead of clamping to (0,0) -- the
+		// old clamp forced a hard snap to the top-left corner right at the
+		// zoom-out limit, which looked like the camera panning/tilting on
+		// its own. This is continuous with the clamped case exactly at the
+		// point fieldW/fieldH crosses monW/monH, so there's no jump.
+		if (fieldW <= monW) {
+			state.x = (monW - fieldW) / 2;
+		} else {
+			var minX = monW - fieldW;
+			state.x = Math.max(minX, Math.min(0, state.x));
+		}
+
+		if (fieldH <= monH) {
+			state.y = (monH - fieldH) / 2;
+		} else {
+			var minY = monH - fieldH;
+			state.y = Math.max(minY, Math.min(0, state.y));
+		}
 	}
 
 	function applyTransform() {
