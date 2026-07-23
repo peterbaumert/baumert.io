@@ -84,8 +84,17 @@
 	}
 
 	function applyTransform() {
-		clampPan();
 		field.style.transform = "translate(" + state.x + "px, " + state.y + "px) scale(" + state.scale + ")";
+	}
+
+	// pan (joystick / direct drag) stays clamped to the field's bounds --
+	// zoom does NOT clamp: a real camera doesn't reposition itself when you
+	// zoom, only pan/tilt does, and re-clamping every zoom frame based on
+	// the shrinking bounds was fighting the zoom's own recentering, which
+	// looked like the camera panning/tilting on its own mid-zoom.
+	function clampAndApply() {
+		clampPan();
+		applyTransform();
 	}
 
 	// --- joystick: analog pan while held ---
@@ -104,7 +113,7 @@
 			var dirY = nubOffset.y / (joystickMaxRadiusPx * mag);
 			state.x -= dirX * speed;
 			state.y -= dirY * speed;
-			applyTransform();
+			clampAndApply();
 		}
 		rafId = requestAnimationFrame(joystickLoop);
 	}
@@ -215,7 +224,7 @@
 		if (!dragActive) return;
 		state.x = dragStart.fx + (e.clientX - dragStart.x);
 		state.y = dragStart.fy + (e.clientY - dragStart.y);
-		applyTransform();
+		clampAndApply();
 	});
 	function endDrag() {
 		dragActive = false;

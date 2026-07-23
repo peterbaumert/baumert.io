@@ -280,7 +280,11 @@ body {
 .ptz-monitor {
   position: absolute;
   overflow: hidden;
-  background: #000;
+  /* matches .ptz-field's base color -- zoom is intentionally unclamped
+     (see ptz.js), so it can reveal a sliver beyond the field element's own
+     bounds when zoomed out from an off-center position; same color makes
+     that blend in instead of showing a stark black void */
+  background: #10151c;
   touch-action: none;
   cursor: grab;
   /* the screen isn't a perfect rectangle in the photo (slight camera-angle
