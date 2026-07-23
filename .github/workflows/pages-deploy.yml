@@ -1,0 +1,27 @@
+name: Cloudflare Pages Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  deployments: write
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: a7351b52007cd4029348e1f426131379
+          projectName: baumert-io
+          directory: .
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
