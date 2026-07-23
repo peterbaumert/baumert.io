@@ -31,7 +31,7 @@
 				</div>
 			</section>
 
-			<section id="projects" class="screen">
+			<section id="dev" class="screen">
 				<div class="section-label">Dev projects</div>
 				<div class="projects-grid">
 					<div class="card">
@@ -56,11 +56,44 @@
 						</div>
 					</div>
 				</div>
+			</section>
 
-				<div class="section-label ptz-label">PTZ — references</div>
-				<div class="badges">
-					<span class="badge">SAP Arena</span>
-					<span class="badge">Staplercup</span>
+			<section id="ptz" class="screen">
+				<div class="section-label">PTZ</div>
+				<div class="ptz-desk" id="ptzDesk">
+					<img src="img/ptz/desk.png" class="ptz-desk-photo" id="ptzDeskPhoto" alt="" />
+
+					<div class="ptz-monitor" id="ptzMonitor">
+						<div class="ptz-field" id="ptzField">
+							<div class="ptz-card" style="top:120px; left:120px;">
+								<div class="ptz-thumb" style="background-image:url(img/ptz/saparena.png);"></div>
+								<h3>SAP Arena</h3>
+								<div class="ptz-meta">2011&ndash;present &middot; Mannheim</div>
+								<p>LED board operation, advertising spot coordination, and multi-camera remote operation.</p>
+							</div>
+							<div class="ptz-card" style="top:160px; left:650px;">
+								<div class="ptz-thumb" style="background-image:url(img/ptz/weinkoenigin.png);"></div>
+								<h3>Pfälzische Weinkönigin</h3>
+								<div class="ptz-meta">2025&ndash;2026 &middot; Neustadt</div>
+								<p>Remote camera work for OK Weinstraße's broadcast of the Palatinate Wine Queen election.</p>
+							</div>
+							<div class="ptz-card" style="top:520px; left:350px;">
+								<div class="ptz-thumb" style="background-image:url(img/ptz/staplercup.png);"></div>
+								<h3>Staplercup</h3>
+								<div class="ptz-meta">2025</div>
+								<p>Remote PTZ camera operation at Staplercup.</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="ptz-joystick-hit" id="ptzJoystickHit">
+						<div class="ptz-joystick-glow"></div>
+					</div>
+
+					<div class="ptz-zoom-hit" id="ptzZoomHit">
+						<div class="ptz-zoom-half" id="ptzZoomIn"></div>
+						<div class="ptz-zoom-half" id="ptzZoomOut"></div>
+					</div>
 				</div>
 			</section>
 
@@ -87,8 +120,9 @@
 			<div id="hostname">baumert.io</div>
 			<nav id="windows">
 				<a href="#" class="tab active" data-tab="home">0:Home</a>
-				<a href="#" class="tab" data-tab="projects">1:Projects</a>
-				<a href="#" class="tab" data-tab="impressum">2:Impressum</a>
+				<a href="#" class="tab" data-tab="dev">1:Dev</a>
+				<a href="#" class="tab" data-tab="ptz">2:PTZ</a>
+				<a href="#" class="tab" data-tab="impressum">3:Impressum</a>
 			</nav>
 			<div id="clock">
 				<span id="date"></span>
@@ -97,6 +131,7 @@
 		</footer>
 	</div>
 	<script type="text/javascript" src="js/script.js"></script>
+	<script type="text/javascript" src="js/ptz.js"></script>
 </body>
 
 </html>

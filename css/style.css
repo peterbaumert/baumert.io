@@ -246,6 +246,152 @@ body {
   font-weight: bold;
 }
 
+/* PTZ */
+.ptz-desk {
+  position: relative;
+  width: min(1000px, 100%);
+  aspect-ratio: 1672 / 941;
+  touch-action: none;
+  margin: 0 auto;
+}
+
+.ptz-desk-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.ptz-monitor {
+  position: absolute;
+  overflow: hidden;
+  background: #000;
+  touch-action: none;
+  cursor: grab;
+  /* the screen isn't a perfect rectangle in the photo (slight camera-angle
+     skew) -- clipped to the actual measured 4 corners rather than just
+     the bounding box, so it doesn't spill onto the bezel at any corner */
+  clip-path: polygon(0% 0%, 100% 0%, 99.25% 100%, 0% 98%);
+}
+
+.ptz-monitor.dragging {
+  cursor: grabbing;
+}
+
+.ptz-field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1400px;
+  height: 900px;
+  transform-origin: 0 0;
+  background: #10151c;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(120, 160, 220, 0.08) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(120, 160, 220, 0.08) 0 1px, transparent 1px 40px);
+}
+
+.ptz-card {
+  position: absolute;
+  width: 240px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ptz-thumb {
+  width: 100%;
+  height: 90px;
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  background-size: cover;
+  background-position: center;
+  background-color: #333;
+}
+
+.ptz-card h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+
+.ptz-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--color-ink-muted);
+  margin: 0 0 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ptz-card p {
+  margin: 0;
+  color: var(--color-ink-muted);
+}
+
+.ptz-joystick-hit {
+  position: absolute;
+  border-radius: 50%;
+  touch-action: none;
+  cursor: grab;
+}
+
+.ptz-joystick-hit.dragging {
+  cursor: grabbing;
+}
+
+.ptz-joystick-glow {
+  position: absolute;
+  width: 26%;
+  height: 26%;
+  left: 37%;
+  top: 37%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201, 166, 255, 0.55), rgba(201, 166, 255, 0) 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.ptz-joystick-hit.dragging .ptz-joystick-glow {
+  opacity: 1;
+}
+
+.ptz-zoom-hit {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.ptz-zoom-half {
+  flex: 1;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.1s;
+}
+
+.ptz-zoom-half:first-child {
+  cursor: n-resize;
+}
+
+.ptz-zoom-half:last-child {
+  cursor: s-resize;
+}
+
+.ptz-zoom-half.active {
+  background: rgba(57, 211, 83, 0.35);
+}
+
 /* Responsive */
 @media (max-width: 800px) {
   .content {
