@@ -51,70 +51,33 @@
 		applyTransform();
 	}
 
-	var state = { x: -60, y: -60, scale: 0.75 };
+	// The camera's "aim point" -- panX/panY are a position in the FIELD's own
+	// natural coordinate space (0..fieldWidth, 0..fieldHeight), independent of
+	// zoom. This is the key property a real PTZ camera has that the earlier
+	// version didn't: the pannable range doesn't shrink or grow with zoom --
+	// zoomed out or in, you can aim anywhere across the same fixed range.
+	// Zoom is then pure magnification around that fixed aim point: it never
+	// touches panX/panY at all, so it can never "reposition" the camera.
+	var state = { panX: 700, panY: 450, scale: 0.75 };
 	var SCALE_MIN = 0.4, SCALE_MAX = 2.2;
-	var PAN_MAX_SPEED = 9; // px per frame at full deflection
+	var PAN_MAX_SPEED = 9; // screen px per frame at full deflection
 	var ZOOM_SPEED = 0.012; // per frame
 
-	// once zoomed out far enough that the field is smaller than the monitor
-	// viewport, there's only one sensible position: centered. Used by BOTH
-	// pan and zoom, continuously, so it's never left off-center waiting for
-	// the next pan touch to suddenly snap it into place.
-	function centerIfSmallerThanMonitor() {
-		var fieldW = field.offsetWidth * state.scale;
-		var fieldH = field.offsetHeight * state.scale;
-		var monW = monitor.clientWidth;
-		var monH = monitor.clientHeight;
-		// ease toward centered rather than snapping instantly -- the field
-		// can cross from "bigger than the monitor" to "smaller" in a single
-		// zoom frame, and jumping straight to the centered value right at
-		// that frame looked like a sudden pan. Closing the gap gradually
-		// over a few frames instead makes it read as a smooth settle.
-		var ease = 0.08;
-		if (fieldW <= monW) {
-			var targetX = (monW - fieldW) / 2;
-			state.x += (targetX - state.x) * ease;
-		}
-		if (fieldH <= monH) {
-			var targetY = (monH - fieldH) / 2;
-			state.y += (targetY - state.y) * ease;
-		}
-	}
-
-	// full pan clamp: stay within the field's edges. Only used by actual
-	// pan operations (joystick, direct drag) -- zoom does NOT clamp to
-	// edges (a real camera doesn't reposition itself when you zoom, only
-	// pan/tilt does; re-clamping every zoom frame fought the zoom's own
-	// center-lock recentering and looked like the camera panning on its
-	// own), but it DOES still get centerIfSmallerThanMonitor so it never
-	// ends up sitting off-center once the whole field fits in view.
 	function clampPan() {
-		centerIfSmallerThanMonitor();
-
-		var fieldW = field.offsetWidth * state.scale;
-		var fieldH = field.offsetHeight * state.scale;
-		var monW = monitor.clientWidth;
-		var monH = monitor.clientHeight;
-
-		if (fieldW > monW) {
-			var minX = monW - fieldW;
-			state.x = Math.max(minX, Math.min(0, state.x));
-		}
-		if (fieldH > monH) {
-			var minY = monH - fieldH;
-			state.y = Math.max(minY, Math.min(0, state.y));
-		}
+		var fieldW = field.offsetWidth;
+		var fieldH = field.offsetHeight;
+		state.panX = Math.max(0, Math.min(fieldW, state.panX));
+		state.panY = Math.max(0, Math.min(fieldH, state.panY));
 	}
 
 	function applyTransform() {
-		field.style.transform = "translate(" + state.x + "px, " + state.y + "px) scale(" + state.scale + ")";
+		var monW = monitor.clientWidth;
+		var monH = monitor.clientHeight;
+		var x = monW / 2 - state.panX * state.scale;
+		var y = monH / 2 - state.panY * state.scale;
+		field.style.transform = "translate(" + x + "px, " + y + "px) scale(" + state.scale + ")";
 	}
 
-	// pan (joystick / direct drag) stays clamped to the field's bounds --
-	// zoom does NOT clamp: a real camera doesn't reposition itself when you
-	// zoom, only pan/tilt does, and re-clamping every zoom frame based on
-	// the shrinking bounds was fighting the zoom's own recentering, which
-	// looked like the camera panning/tilting on its own mid-zoom.
 	function clampAndApply() {
 		clampPan();
 		applyTransform();
@@ -131,11 +94,14 @@
 		if (mag > 0.02) {
 			// squared response curve: small pushes (easy to overshoot on touch)
 			// move slowly for fine control, only full deflection hits max speed
-			var speed = PAN_MAX_SPEED * mag * mag;
+			var speed = PAN_MAX_SPEED * mag * mag; // screen px/frame
 			var dirX = nubOffset.x / (joystickMaxRadiusPx * mag);
 			var dirY = nubOffset.y / (joystickMaxRadiusPx * mag);
-			state.x -= dirX * speed;
-			state.y -= dirY * speed;
+			// convert screen-space speed to field-space so panning feels the
+			// same on screen at any zoom level (same screen speed = less
+			// field distance covered per frame when zoomed in, more when out)
+			state.panX += (dirX * speed) / state.scale;
+			state.panY += (dirY * speed) / state.scale;
 			clampAndApply();
 		}
 		rafId = requestAnimationFrame(joystickLoop);
@@ -180,8 +146,10 @@
 	joystickHit.addEventListener("pointercancel", releaseJoystick);
 
 	// --- zoom: analog drag, same pattern as the joystick but vertical-only.
-	// Drag up = zoom in, drag down = zoom out, further = faster, pivoting
-	// around the viewport center so it feels like a straight dolly in/out.
+	// Drag up = zoom in, drag down = zoom out, further = faster. Pure
+	// magnification around the fixed aim point (panX/panY) -- never touches
+	// pan at all, so it can never reposition the camera, matching how a real
+	// camera's zoom doesn't move its pan/tilt.
 	var zoomActive = false;
 	var zoomRafId = null;
 	var zoomOffset = 0; // vertical drag offset, clamped to +-zoomMaxRangePx
@@ -193,24 +161,12 @@
 		if (mag > 0.02) {
 			var dir = zoomOffset < 0 ? 1 : -1; // dragging up (negative offset) zooms in
 			var speed = ZOOM_SPEED * mag * mag;
-			var oldScale = state.scale;
-			var newScale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, oldScale + dir * speed));
-			if (newScale !== oldScale) {
-				var cx = monitor.clientWidth / 2;
-				var cy = monitor.clientHeight / 2;
-				var ratio = newScale / oldScale;
-				state.x = cx - ratio * (cx - state.x);
-				state.y = cy - ratio * (cy - state.y);
+			var newScale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, state.scale + dir * speed));
+			if (newScale !== state.scale) {
 				state.scale = newScale;
+				applyTransform();
 			}
 		}
-		// runs every frame regardless of whether scale is still changing --
-		// once scale hits SCALE_MIN, newScale===oldScale forever, and if this
-		// were nested inside that check the easing toward center would just
-		// freeze wherever it happened to be the instant the floor was hit,
-		// never actually finishing even if the drag is held well past that.
-		centerIfSmallerThanMonitor();
-		applyTransform();
 		zoomRafId = requestAnimationFrame(zoomLoop);
 	}
 
@@ -242,17 +198,17 @@
 
 	// --- fallback: direct drag on the monitor screen ---
 	var dragActive = false;
-	var dragStart = { x: 0, y: 0, fx: 0, fy: 0 };
+	var dragStart = { x: 0, y: 0, panX: 0, panY: 0 };
 	monitor.addEventListener("pointerdown", function (e) {
 		dragActive = true;
 		monitor.classList.add("dragging");
 		monitor.setPointerCapture(e.pointerId);
-		dragStart = { x: e.clientX, y: e.clientY, fx: state.x, fy: state.y };
+		dragStart = { x: e.clientX, y: e.clientY, panX: state.panX, panY: state.panY };
 	});
 	monitor.addEventListener("pointermove", function (e) {
 		if (!dragActive) return;
-		state.x = dragStart.fx + (e.clientX - dragStart.x);
-		state.y = dragStart.fy + (e.clientY - dragStart.y);
+		state.panX = dragStart.panX - (e.clientX - dragStart.x) / state.scale;
+		state.panY = dragStart.panY - (e.clientY - dragStart.y) / state.scale;
 		clampAndApply();
 	});
 	function endDrag() {
