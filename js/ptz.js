@@ -70,12 +70,20 @@
 		state.panY = Math.max(0, Math.min(fieldH, state.panY));
 	}
 
+	var GRID_CELL = 40; // px, natural scale -- must match .ptz-monitor's background-image period
+
 	function applyTransform() {
 		var monW = monitor.clientWidth;
 		var monH = monitor.clientHeight;
 		var x = monW / 2 - state.panX * state.scale;
 		var y = monH / 2 - state.panY * state.scale;
 		field.style.transform = "translate(" + x + "px, " + y + "px) scale(" + state.scale + ")";
+		// keep the monitor's own background grid (see .ptz-monitor CSS) in
+		// perfect sync with the field's pan/zoom so it reads as one endless
+		// grid instead of visibly stopping at the field element's edges
+		var gridSize = GRID_CELL * state.scale;
+		monitor.style.backgroundPosition = x + "px " + y + "px";
+		monitor.style.backgroundSize = gridSize + "px " + gridSize + "px";
 	}
 
 	function clampAndApply() {

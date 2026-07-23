@@ -280,11 +280,16 @@ body {
 .ptz-monitor {
   position: absolute;
   overflow: hidden;
-  /* matches .ptz-field's base color -- zoom is intentionally unclamped
-     (see ptz.js), so it can reveal a sliver beyond the field element's own
-     bounds when zoomed out from an off-center position; same color makes
-     that blend in instead of showing a stark black void */
-  background: #10151c;
+  /* the grid pattern lives here, not on .ptz-field -- panning/zooming can
+     go beyond the field's own 1400x900 bounds (see the aim-point model in
+     ptz.js), and a background tied to the field's element edges would show
+     a visible seam there. background-position/-size are kept in sync with
+     the field's own pan/zoom transform in JS, so it reads as one endless
+     grid instead of stopping at a hard edge. */
+  background-color: #10151c;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(120, 160, 220, 0.08) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(120, 160, 220, 0.08) 0 1px, transparent 1px 40px);
   touch-action: none;
   cursor: grab;
   /* the screen isn't a perfect rectangle in the photo (slight camera-angle
@@ -304,10 +309,6 @@ body {
   width: 1400px;
   height: 900px;
   transform-origin: 0 0;
-  background: #10151c;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(120, 160, 220, 0.08) 0 1px, transparent 1px 40px),
-    repeating-linear-gradient(90deg, rgba(120, 160, 220, 0.08) 0 1px, transparent 1px 40px);
 }
 
 .ptz-card {
