@@ -4,63 +4,97 @@
 <head>
 	<title>Peter Baumert</title>
 	<meta charset="utf-8" />
-	<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-	<link rel="stylesheet"
-		href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
-	<div class="markdown-body content" id="impressum">
-		<div id="impressum">
-				<div>
-					<div></div>
-					<div>
-						<h4><span>Impressum</span></h4>
-						<div>
-							baumert.io - Peter Baumert<br>
-							c/o Online-Impressum.de #5794<br>
-							Europaring 90<br>
-							53757 Sankt Augustin<br>
-							&nbsp;<br>
-							E-Mail: baumert.io@mail.online-impressum.de<br>
-							&nbsp;<br>
-							<u>Zuständige Regulierungs- und Aufsichtsbehörde:</u><br>
-							Landesanstalt für Kommunikation Baden-Württemberg<br>
-							Sitz: Deutschland<br>
-							&nbsp;<br>
+	<div class="page">
+		<main class="content">
+			<section id="home" class="screen active">
+				<div class="home-grid">
+					<div class="home-main">
+						<h1 class="name">Peter Baumert</h1>
+						<p class="bio">IT systems administrator and developer. Also works as a remote PTZ camera operator, most recently for SAP Arena and Staplercup.</p>
+					</div>
+					<div class="card">
+						<div class="card-header">Quick facts</div>
+						<div class="card-body facts">
+							<div class="fact-row"><span class="fact-label">role</span><span class="fact-value">sysadmin · dev · ptz</span></div>
+							<div class="fact-row"><span class="fact-label">base</span><span class="fact-value">germany</span></div>
+							<div class="fact-row"><span class="fact-label">ptz refs</span><span class="fact-value">sap arena · staplercup</span></div>
 						</div>
 					</div>
 				</div>
-			</div>
-	</div>
-	<div class="content" id="home">
-		<pre>
+			</section>
 
- ██▓███  ▓█████▄▄▄█████▓▓█████  ██▀███   ▄▄▄▄    ▄▄▄       █    ██  ███▄ ▄███▓▓█████  ██▀███  ▄▄▄█████▓
-▓██░  ██▒▓█   ▀▓  ██▒ ▓▒▓█   ▀ ▓██ ▒ ██▒▓█████▄ ▒████▄     ██  ▓██▒▓██▒▀█▀ ██▒▓█   ▀ ▓██ ▒ ██▒▓  ██▒ ▓▒
-▓██░ ██▓▒▒███  ▒ ▓██░ ▒░▒███   ▓██ ░▄█ ▒▒██▒ ▄██▒██  ▀█▄  ▓██  ▒██░▓██    ▓██░▒███   ▓██ ░▄█ ▒▒ ▓██░ ▒░
-▒██▄█▓▒ ▒▒▓█  ▄░ ▓██▓ ░ ▒▓█  ▄ ▒██▀▀█▄  ▒██░█▀  ░██▄▄▄▄██ ▓▓█  ░██░▒██    ▒██ ▒▓█  ▄ ▒██▀▀█▄  ░ ▓██▓ ░ 
-▒██▒ ░  ░░▒████▒ ▒██▒ ░ ░▒████▒░██▓ ▒██▒░▓█  ▀█▓ ▓█   ▓██▒▒▒█████▓ ▒██▒   ░██▒░▒████▒░██▓ ▒██▒  ▒██▒ ░ 
-▒▓▒░ ░  ░░░ ▒░ ░ ▒ ░░   ░░ ▒░ ░░ ▒▓ ░▒▓░░▒▓███▀▒ ▒▒   ▓▒█░░▒▓▒ ▒ ▒ ░ ▒░   ░  ░░░ ▒░ ░░ ▒▓ ░▒▓░  ▒ ░░   
-░▒ ░      ░ ░  ░   ░     ░ ░  ░  ░▒ ░ ▒░▒░▒   ░   ▒   ▒▒ ░░░▒░ ░ ░ ░  ░      ░ ░ ░  ░  ░▒ ░ ▒░    ░    
-░░          ░    ░         ░     ░░   ░  ░    ░   ░   ▒    ░░░ ░ ░ ░      ░      ░     ░░   ░   ░      
-            ░  ░           ░  ░   ░      ░            ░  ░   ░            ░      ░  ░   ░              
-                                              ░                                                        
-        </pre>
-	</div>
-	<div id="footer">
-		<div id="hostname">baumert.io</div>
-		<div id="session">local</div>
-		<div id="windows">
-			<a class="active" href="#home">0:Home</a>
-			<a href="#impressum">1:Impressum</a>
-		</div>
-		<!-- <div id="speed"></div> -->
-		<div>
-			<div id="date">01.01.2020</div>
-			<div id="time">19:45:12</div>
-		</div>
+			<section id="projects" class="screen">
+				<div class="section-label">Dev projects</div>
+				<div class="projects-grid">
+					<div class="card">
+						<div class="card-header mono">netbox-device-view</div>
+						<div class="card-body">
+							<p class="project-desc">NetBox plugin rendering a device's physical ports and interfaces as a visual grid.</p>
+							<a class="repo-link" href="https://github.com/peterbaumert/netbox-device-view" target="_blank" rel="noopener">view repo →</a>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-header mono">streamdeck-vmix-plugin</div>
+						<div class="card-body">
+							<p class="project-desc">Stream Deck plugin to control vMix via its API.</p>
+							<a class="repo-link" href="https://github.com/peterbaumert/streamdeck-vmix-plugin" target="_blank" rel="noopener">view repo →</a>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-header mono">netbox-widget-chart</div>
+						<div class="card-body">
+							<p class="project-desc">Configurable chart dashboard widget for NetBox.</p>
+							<a class="repo-link" href="https://github.com/peterbaumert/netbox-widget-chart" target="_blank" rel="noopener">view repo →</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="section-label ptz-label">PTZ — references</div>
+				<div class="badges">
+					<span class="badge">SAP Arena</span>
+					<span class="badge">Staplercup</span>
+				</div>
+			</section>
+
+			<section id="impressum" class="screen">
+				<div class="card impressum-card">
+					<div class="card-header">Impressum</div>
+					<div class="card-body impressum-body">
+						baumert.io - Peter Baumert<br>
+						c/o Online-Impressum.de #5794<br>
+						Europaring 90<br>
+						53757 Sankt Augustin<br>
+						<br>
+						E-Mail: baumert.io@mail.online-impressum.de<br>
+						<br>
+						<u>Zuständige Regulierungs- und Aufsichtsbehörde:</u><br>
+						Landesanstalt für Kommunikation Baden-Württemberg<br>
+						Sitz: Deutschland
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer id="footer">
+			<div id="hostname">baumert.io</div>
+			<nav id="windows">
+				<a href="#" class="tab active" data-tab="home">0:Home</a>
+				<a href="#" class="tab" data-tab="projects">1:Projects</a>
+				<a href="#" class="tab" data-tab="impressum">2:Impressum</a>
+			</nav>
+			<div id="clock">
+				<span id="date"></span>
+				<span id="time"></span>
+			</div>
+		</footer>
 	</div>
 	<script type="text/javascript" src="js/script.js"></script>
 </body>
