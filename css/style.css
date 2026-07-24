@@ -278,7 +278,7 @@ body.ptz-active {
   margin-left: 50%;
   transform: translateX(-50%);
   /* soft frame instead of a hard-edged raw rectangle -- reads as a
-     deliberately designed panel rather than a dropped-in screenshot */
+     deliberately designed panel rather than a dropped-in screenshot. */
   border-radius: 20px;
   overflow: hidden;
   /* touch-action alone stops scroll/zoom gestures, but iOS still starts a
@@ -287,6 +287,24 @@ body.ptz-active {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+}
+
+/* vignette overlay -- a plain child/pseudo-element painted on top, not an
+   inset box-shadow on .ptz-desk itself: inset shadows paint as part of the
+   parent's own background layer, which sits BELOW child content in paint
+   order, so it was invisible behind the opaque photo (confirmed by testing
+   with a garish red shadow -- nothing showed up at all). This overlay is
+   last in the DOM so it paints on top of everything, with pointer-events
+   none so it doesn't block the joystick/zoom/monitor underneath.
+   Fixed pixel blur distance (not a % of each axis, like a radial mask
+   would be) so top/bottom fade by a comparable amount to left/right,
+   despite the box being much wider than it is tall. */
+.ptz-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 70px 25px #10151c;
 }
 
 .ptz-desk-photo {
