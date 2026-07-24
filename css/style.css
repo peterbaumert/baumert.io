@@ -291,6 +291,15 @@ body.ptz-active {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+  /* fades in via script.js's "visible" class toggle, timed with the body's
+     background-color transition -- see the comment there for why it's a
+     class toggle rather than just always transitioning opacity */
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.ptz-desk.visible {
+  opacity: 1;
 }
 
 /* vignette overlay -- a plain child/pseudo-element painted on top, not an
