@@ -44,6 +44,10 @@ body {
   background-color: var(--color-canvas);
   color: var(--color-ink);
   font-family: "Inter", sans-serif;
+  /* the tab content itself still swaps instantly (no change there) -- this
+     is just for the light/dark background swap specifically, so switching
+     into or out of the PTZ tab doesn't hard-cut between canvas and page */
+  transition: background-color 0.35s ease;
 }
 
 /* PTZ is a different kind of content (a photo scene, not text/cards) --
