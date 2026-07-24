@@ -11,42 +11,77 @@ document.addEventListener("DOMContentLoaded", function () {
 	var tabs = document.querySelectorAll("#windows .tab");
 	var screens = document.querySelectorAll(".screen");
 	var ptzDesk = document.getElementById("ptzDesk");
+	var validTabs = [];
+	tabs.forEach(function (t) { validTabs.push(t.getAttribute("data-tab")); });
+
+	// shared by both an actual click and the initial #hash check below, so
+	// a direct link to e.g. #ptz goes through the exact same activation
+	// (including the PTZ fade-in and the "tabactivated" event ptz.js needs
+	// to re-run its own layout) as clicking the tab normally would.
+	function activateTab(target, updateHash) {
+		var tab = document.querySelector('#windows .tab[data-tab="' + target + '"]');
+		if (!tab) return;
+
+		tabs.forEach(function (t) { t.classList.remove("active"); });
+		tab.classList.add("active");
+
+		screens.forEach(function (screen) {
+			screen.classList.toggle("active", screen.id === target);
+		});
+
+		document.body.classList.toggle("ptz-active", target === "ptz");
+
+		// the scene itself used to hard-cut in via display:none/block while
+		// the background around it faded, which looked mismatched. Fade the
+		// scene in too, timed with the same background transition.
+		// display:block happens instantly above (needed so layout/sizing
+		// works), so opacity starts at 0 and the "visible" class is added a
+		// couple frames later -- one rAF often isn't enough for the browser
+		// to have actually painted the display change yet, so the opacity
+		// jump straight to 1 with nothing to transition from.
+		if (ptzDesk) {
+			if (target === "ptz") {
+				ptzDesk.classList.remove("visible");
+				requestAnimationFrame(function () {
+					requestAnimationFrame(function () {
+						ptzDesk.classList.add("visible");
+					});
+				});
+			} else {
+				ptzDesk.classList.remove("visible");
+			}
+		}
+
+		if (updateHash) {
+			// replaceState (not pushState/location.hash) so tab switches
+			// don't (a) pile up in browser history one entry per click, or
+			// (b) trigger the browser's native jump-to-anchor scrolling
+			history.replaceState(null, "", "#" + target);
+		}
+
+		document.dispatchEvent(new CustomEvent("tabactivated", { detail: { target: target } }));
+	}
 
 	tabs.forEach(function (tab) {
 		tab.addEventListener("click", function (e) {
 			e.preventDefault();
-			var target = tab.getAttribute("data-tab");
-
-			tabs.forEach(function (t) { t.classList.remove("active"); });
-			tab.classList.add("active");
-
-			screens.forEach(function (screen) {
-				screen.classList.toggle("active", screen.id === target);
-			});
-
-			document.body.classList.toggle("ptz-active", target === "ptz");
-
-			// the scene itself used to hard-cut in via display:none/block
-			// while the background around it faded, which looked mismatched.
-			// Fade the scene in too, timed with the same background
-			// transition. display:block happens instantly above (needed so
-			// layout/sizing works), so opacity starts at 0 and the "visible"
-			// class is added a couple frames later -- one rAF often isn't
-			// enough for the browser to have actually painted the display
-			// change yet, so the opacity jump straight to 1 with nothing to
-			// transition from.
-			if (ptzDesk) {
-				if (target === "ptz") {
-					ptzDesk.classList.remove("visible");
-					requestAnimationFrame(function () {
-						requestAnimationFrame(function () {
-							ptzDesk.classList.add("visible");
-						});
-					});
-				} else {
-					ptzDesk.classList.remove("visible");
-				}
-			}
+			activateTab(tab.getAttribute("data-tab"), true);
 		});
+	});
+
+	var initialHash = window.location.hash.replace("#", "");
+	if (validTabs.indexOf(initialHash) !== -1) {
+		activateTab(initialHash, false);
+	}
+
+	// covers navigating between two URLs that differ only by hash fragment
+	// (e.g. a same-tab link, or manually editing the address bar) -- that
+	// doesn't reload the page/re-fire DOMContentLoaded, so without this the
+	// tab would silently not update even though the URL changed
+	window.addEventListener("hashchange", function () {
+		var hash = window.location.hash.replace("#", "");
+		if (validTabs.indexOf(hash) !== -1) {
+			activateTab(hash, false);
+		}
 	});
 });

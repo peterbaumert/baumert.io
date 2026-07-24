@@ -251,11 +251,13 @@
 	else deskPhoto.addEventListener("load", layout);
 
 	// re-run layout once the PTZ tab actually becomes visible -- it's
-	// display:none until then, so clientWidth reads 0 and layout() no-ops
-	var ptzTabLink = document.querySelector('[data-tab="ptz"]');
-	if (ptzTabLink) {
-		ptzTabLink.addEventListener("click", function () {
+	// display:none until then, so clientWidth reads 0 and layout() no-ops.
+	// Listens for script.js's "tabactivated" event rather than a click on
+	// the tab link specifically, so a direct #ptz link on page load (which
+	// activates the tab without any click happening) still triggers this.
+	document.addEventListener("tabactivated", function (e) {
+		if (e.detail.target === "ptz") {
 			requestAnimationFrame(layout);
-		});
-	}
+		}
+	});
 })();
