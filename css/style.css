@@ -46,6 +46,19 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+/* PTZ is a different kind of content (a photo scene, not text/cards) --
+   giving it its own dark backdrop instead of the light canvas removes the
+   hard seam where the photo's dark tones used to butt straight up against
+   the light page, without changing the light "Hybrid Console" look of the
+   other tabs. Matches the PTZ grid's own base color for continuity. */
+body.ptz-active {
+  background-color: #10151c;
+}
+
+#ptz .section-label {
+  color: var(--color-panel-muted);
+}
+
 .page {
   flex: 1 0 auto;
   display: flex;
@@ -264,6 +277,10 @@ body {
   touch-action: none;
   margin-left: 50%;
   transform: translateX(-50%);
+  /* soft frame instead of a hard-edged raw rectangle -- reads as a
+     deliberately designed panel rather than a dropped-in screenshot */
+  border-radius: 20px;
+  overflow: hidden;
   /* touch-action alone stops scroll/zoom gestures, but iOS still starts a
      text-selection / long-press callout on drags over the card text --
      nothing in this scene is meant to be selectable, so disable it entirely */

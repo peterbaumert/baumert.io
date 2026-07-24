@@ -22,6 +22,8 @@ document.addEventListener("DOMContentLoaded", function () {
 			screens.forEach(function (screen) {
 				screen.classList.toggle("active", screen.id === target);
 			});
+
+			document.body.classList.toggle("ptz-active", target === "ptz");
 		});
 	});
 });
