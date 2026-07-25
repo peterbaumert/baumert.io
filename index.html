@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Peter Baumert</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+	<div class="page">
+		<main class="content">
+			<section id="home" class="screen active">
+				<div class="home-grid">
+					<div class="home-main">
+						<h1 class="name">Peter Baumert</h1>
+						<p class="bio">IT systems administrator and developer. Also works as a remote PTZ camera operator, most recently for SAP Arena and Staplercup.</p>
+					</div>
+					<div class="card">
+						<div class="card-header">Quick facts</div>
+						<div class="card-body facts">
+							<div class="fact-row"><span class="fact-label">role</span><span class="fact-value">sysadmin · dev · ptz</span></div>
+							<div class="fact-row"><span class="fact-label">base</span><span class="fact-value">germany</span></div>
+							<div class="fact-row"><span class="fact-label">ptz refs</span><span class="fact-value">sap arena · staplercup</span></div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="dev" class="screen">
+				<div class="section-label">Dev projects</div>
+				<div class="projects-grid">
+					<div class="card">
+						<div class="card-header mono">netbox-device-view</div>
+						<div class="card-body">
+							<p class="project-desc">NetBox plugin rendering a device's physical ports and interfaces as a visual grid.</p>
+							<a class="repo-link" href="https://github.com/peterbaumert/netbox-device-view" target="_blank" rel="noopener">view repo →</a>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-header mono">streamdeck-vmix-plugin</div>
+						<div class="card-body">
+							<p class="project-desc">Stream Deck plugin to control vMix via its API.</p>
+							<a class="repo-link" href="https://github.com/peterbaumert/streamdeck-vmix-plugin" target="_blank" rel="noopener">view repo →</a>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-header mono">netbox-widget-chart</div>
+						<div class="card-body">
+							<p class="project-desc">Configurable chart dashboard widget for NetBox.</p>
+							<a class="repo-link" href="https://github.com/peterbaumert/netbox-widget-chart" target="_blank" rel="noopener">view repo →</a>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="ptz" class="screen">
+				<div class="section-label">PTZ</div>
+				<div class="ptz-desk" id="ptzDesk">
+					<img src="img/ptz/desk.png" class="ptz-desk-photo" id="ptzDeskPhoto" alt="" />
+
+					<div class="ptz-monitor" id="ptzMonitor">
+						<div class="ptz-field" id="ptzField">
+							<div class="ptz-card" style="top:120px; left:120px;">
+								<div class="ptz-thumb" style="background-image:url(img/ptz/saparena.png);"></div>
+								<h3>SAP Arena</h3>
+								<div class="ptz-meta">2011&ndash;present &middot; Mannheim</div>
+								<p>LED board operation, advertising spot coordination, and multi-camera remote operation.</p>
+							</div>
+							<div class="ptz-card" style="top:160px; left:650px;">
+								<div class="ptz-thumb" style="background-image:url(img/ptz/weinkoenigin.png);"></div>
+								<h3>Pfälzische Weinkönigin</h3>
+								<div class="ptz-meta">2025&ndash;2026 &middot; Neustadt</div>
+								<p>Remote camera work for OK Weinstraße's broadcast of the Palatinate Wine Queen election.</p>
+							</div>
+							<div class="ptz-card" style="top:520px; left:350px;">
+								<div class="ptz-thumb" style="background-image:url(img/ptz/staplercup.png);"></div>
+								<h3>Staplercup</h3>
+								<div class="ptz-meta">2025</div>
+								<p>Remote PTZ camera operation at Staplercup.</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="ptz-joystick-hit" id="ptzJoystickHit">
+						<div class="ptz-joystick-glow"></div>
+					</div>
+
+					<div class="ptz-zoom-hit" id="ptzZoomHit">
+						<div class="ptz-zoom-glow"></div>
+					</div>
+
+					<div class="ptz-vignette"></div>
+				</div>
+			</section>
+
+			<section id="impressum" class="screen">
+				<div class="card impressum-card">
+					<div class="card-header">Impressum</div>
+					<div class="card-body impressum-body">
+						baumert.io - Peter Baumert<br>
+						c/o Online-Impressum.de #5794<br>
+						Europaring 90<br>
+						53757 Sankt Augustin<br>
+						<br>
+						E-Mail: baumert.io@mail.online-impressum.de<br>
+						<br>
+						<u>Zuständige Regulierungs- und Aufsichtsbehörde:</u><br>
+						Landesanstalt für Kommunikation Baden-Württemberg<br>
+						Sitz: Deutschland
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer id="footer">
+			<div id="hostname">baumert.io</div>
+			<nav id="windows">
+				<a href="#home" class="tab active" data-tab="home">0:Home</a>
+				<a href="#dev" class="tab" data-tab="dev">1:Dev</a>
+				<a href="#ptz" class="tab" data-tab="ptz">2:PTZ</a>
+				<a href="#impressum" class="tab" data-tab="impressum">3:Impressum</a>
+			</nav>
+			<div id="clock">
+				<span id="date"></span>
+				<span id="time"></span>
+			</div>
+		</footer>
+	</div>
+	<script type="text/javascript" src="js/script.js"></script>
+	<script type="text/javascript" src="js/ptz.js"></script>
+</body>
+
+</html>

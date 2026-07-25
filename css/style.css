@@ -1,0 +1,519 @@
+:root {
+  --color-canvas: #f5f5f0;
+  --color-surface: #ffffff;
+  --color-ink: #1a1a1a;
+  --color-ink-muted: #666666;
+  --color-border: #e0e0dc;
+  --color-border-strong: #c9c9c9;
+  --color-blue: #0057ff;
+  --color-blue-hover: #0044cc;
+  --color-blue-tint: #e8f0ff;
+  --color-panel: #1a1a1a;
+  --color-panel-text: #d3d3d3;
+  --color-panel-muted: #8b8b8b;
+  --color-green: #2ea043;
+  --color-amber: #ffb020;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  /* safety net for the PTZ scene's full-bleed layout: iOS Safari's 100vw
+     can be a few px wider than the true visible viewport (it doesn't
+     account for viewport quirks the way 100% does), which lets the page
+     scroll horizontally by that sliver and cuts off one edge of the
+     full-bleed content. Disallowing horizontal scroll entirely means any
+     such overflow just clips invisibly instead of shifting the viewport. */
+  overflow-x: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: "Inter", sans-serif;
+  /* the tab content itself still swaps instantly (no change there) -- this
+     is just for the light/dark background swap specifically, so switching
+     into or out of the PTZ tab doesn't hard-cut between canvas and page */
+  transition: background-color 0.35s ease;
+}
+
+/* PTZ is a different kind of content (a photo scene, not text/cards) --
+   giving it its own dark backdrop instead of the light canvas removes the
+   hard seam where the photo's dark tones used to butt straight up against
+   the light page, without changing the light "Hybrid Console" look of the
+   other tabs. Matches the PTZ grid's own base color for continuity. */
+body.ptz-active {
+  background-color: #10151c;
+}
+
+#ptz .section-label {
+  color: var(--color-panel-muted);
+}
+
+.page {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.content {
+  flex: 1 0 auto;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 64px 56px 80px;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* Card */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.card-header.mono {
+  font-family: "JetBrains Mono", monospace;
+}
+
+.card-body {
+  padding: 16px;
+}
+
+/* Home */
+.home-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 48px;
+}
+
+.name {
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0 0 16px;
+}
+
+.bio {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+}
+
+.fact-row {
+  display: flex;
+  gap: 8px;
+}
+
+.fact-label {
+  color: var(--color-ink);
+  min-width: 70px;
+}
+
+.fact-value {
+  color: var(--color-ink-muted);
+}
+
+/* Projects */
+.section-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-muted);
+  margin-bottom: 16px;
+}
+
+.ptz-label {
+  margin-top: 40px;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.project-desc {
+  font-size: 14px;
+  color: var(--color-ink-muted);
+  margin: 0 0 12px;
+}
+
+.repo-link {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-blue);
+  text-decoration: none;
+}
+
+.repo-link:hover {
+  color: var(--color-blue-hover);
+  text-decoration: underline;
+}
+
+.badges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-border);
+  color: var(--color-ink-muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+/* Impressum */
+.impressum-card {
+  max-width: 640px;
+}
+
+.impressum-body {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Footer / nav bar */
+#footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  background: #1a1a1a;
+  color: #d3d3d3;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  padding: 10px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#hostname {
+  font-weight: bold;
+  color: #c9a6ff;
+}
+
+#windows {
+  display: flex;
+  gap: 4px;
+}
+
+#windows .tab {
+  padding: 2px 10px;
+  cursor: pointer;
+  color: #9e9e9e;
+  text-decoration: none;
+}
+
+#windows .tab.active {
+  color: #39d353;
+}
+
+#clock {
+  display: flex;
+  gap: 12px;
+}
+
+#date {
+  color: var(--color-amber);
+}
+
+#time {
+  color: var(--color-green);
+  font-weight: bold;
+}
+
+/* PTZ */
+.ptz-desk {
+  position: relative;
+  /* break out of .content's padded/centered column to fill (almost) the
+     full viewport width, capped so it doesn't get absurd on ultra-wide
+     screens or exceed a reasonable viewport height on short ones */
+  width: min(100vw, 1600px, calc(85vh * 1.7768));
+  aspect-ratio: 1672 / 941;
+  touch-action: none;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  /* soft frame instead of a hard-edged raw rectangle -- reads as a
+     deliberately designed panel rather than a dropped-in screenshot. */
+  border-radius: 20px;
+  overflow: hidden;
+  /* touch-action alone stops scroll/zoom gestures, but iOS still starts a
+     text-selection / long-press callout on drags over the card text --
+     nothing in this scene is meant to be selectable, so disable it entirely */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  /* fades in via script.js's "visible" class toggle, timed with the body's
+     background-color transition -- see the comment there for why it's a
+     class toggle rather than just always transitioning opacity */
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.ptz-desk.visible {
+  opacity: 1;
+}
+
+/* vignette overlay -- a plain child/pseudo-element painted on top, not an
+   inset box-shadow on .ptz-desk itself: inset shadows paint as part of the
+   parent's own background layer, which sits BELOW child content in paint
+   order, so it was invisible behind the opaque photo (confirmed by testing
+   with a garish red shadow -- nothing showed up at all). This overlay is
+   last in the DOM so it paints on top of everything, with pointer-events
+   none so it doesn't block the joystick/zoom/monitor underneath.
+   Fixed pixel blur distance (not a % of each axis, like a radial mask
+   would be) so top/bottom fade by a comparable amount to left/right,
+   despite the box being much wider than it is tall. */
+.ptz-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 70px 25px #10151c;
+}
+
+.ptz-desk-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* on mobile .ptz-desk's aspect-ratio is narrower than the photo's native
+     16:9-ish shape (see below), so this crops the sides instead of
+     stretching -- ptz.js's layout() accounts for the resulting crop when
+     positioning the monitor/joystick/zoom hotspots.
+     33% (not 50%/center): the photo's own content isn't centered in the
+     frame -- the monitor+joystick+zoom sit well left of the photo's true
+     geometric center (there's a lot of empty space to the right, past the
+     second monitor). A centered crop cuts into the monitor's left edge;
+     this constant MUST match OBJECT_POSITION_X in ptz.js. */
+  object-fit: cover;
+  object-position: 33% center;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.ptz-monitor {
+  position: absolute;
+  overflow: hidden;
+  /* the grid pattern lives here, not on .ptz-field -- panning/zooming can
+     go beyond the field's own 1400x900 bounds (see the aim-point model in
+     ptz.js), and a background tied to the field's element edges would show
+     a visible seam there. background-position/-size are kept in sync with
+     the field's own pan/zoom transform in JS, so it reads as one endless
+     grid instead of stopping at a hard edge. */
+  background-color: #10151c;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(120, 160, 220, 0.08) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(120, 160, 220, 0.08) 0 1px, transparent 1px 40px);
+  touch-action: none;
+  cursor: grab;
+  /* the screen isn't a perfect rectangle in the photo (slight camera-angle
+     skew) -- clipped to the actual measured 4 corners rather than just
+     the bounding box, so it doesn't spill onto the bezel at any corner */
+  clip-path: polygon(0% 0%, 100% 0%, 99.25% 100%, 0% 98%);
+}
+
+.ptz-monitor.dragging {
+  cursor: grabbing;
+}
+
+.ptz-field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1400px;
+  height: 900px;
+  transform-origin: 0 0;
+}
+
+.ptz-card {
+  position: absolute;
+  width: 240px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ptz-thumb {
+  width: 100%;
+  height: 90px;
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  background-size: cover;
+  background-position: center;
+  background-color: #333;
+}
+
+.ptz-card h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+
+.ptz-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--color-ink-muted);
+  margin: 0 0 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ptz-card p {
+  margin: 0;
+  color: var(--color-ink-muted);
+}
+
+.ptz-joystick-hit {
+  position: absolute;
+  border-radius: 50%;
+  touch-action: none;
+  cursor: grab;
+}
+
+.ptz-joystick-hit.dragging {
+  cursor: grabbing;
+}
+
+.ptz-joystick-glow {
+  position: absolute;
+  width: 26%;
+  height: 26%;
+  left: 37%;
+  top: 37%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201, 166, 255, 0.55), rgba(201, 166, 255, 0) 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.ptz-joystick-hit.dragging .ptz-joystick-glow {
+  opacity: 1;
+}
+
+.ptz-zoom-hit {
+  position: absolute;
+  border-radius: 8px;
+  touch-action: none;
+  cursor: ns-resize;
+}
+
+.ptz-zoom-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: rgba(57, 211, 83, 0.35);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.ptz-zoom-hit.dragging .ptz-zoom-glow {
+  opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+  .content {
+    padding: 32px 24px 80px;
+  }
+
+  .home-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ptz-desk {
+    /* narrower than the photo's native ~16:9 shape -- object-fit:cover
+       crops the sides instead of shrinking the whole (wide) scene down,
+       so the monitor/joystick/zoom read much bigger on a narrow screen.
+       1:1 (not narrower) -- the photo's own content isn't centered in the
+       frame (there's much more empty space on the right than the left),
+       so a tighter ratio here cuts into the monitor itself; verified with
+       the actual measured SCREEN bounds that 1:1 + the object-position
+       shift below leaves real margin on both sides. */
+    aspect-ratio: 1 / 1;
+    width: min(100vw, calc(85vh * 1));
+  }
+}
+
+@media (max-width: 480px) {
+  .name {
+    font-size: 28px;
+  }
+
+  .content {
+    padding-bottom: 100px;
+  }
+
+  #footer {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding: 8px 16px;
+  }
+
+  #windows {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+}
