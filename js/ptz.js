@@ -303,23 +303,33 @@
 		};
 	}
 
-	// scatters already-built (but unpositioned) cards around CENTER_X/Y:
-	// picks a random angle at a growing radius (starting near-center, wider
-	// on each retry) and rejects positions that'd overlap an already-placed
-	// card, same rejection-sampling idea as Poisson-disc scattering. Only
+	// scatters already-built (but unpositioned) cards radially around
+	// CENTER_X/Y: each card gets its own evenly-spaced slice of the full
+	// circle (360deg / card count, in stable card order) so N cards always
+	// fan out in N different directions instead of random angles clustering
+	// together by chance (which is what a fully-random angle did with only
+	// a handful of cards). A little jitter within the slice plus a
+	// randomized radius keeps it from looking like a rigid polygon.
+	// Collision-avoidance is a fallback, not the primary driver of
+	// direction: if a jittered angle still overlaps an already-placed card,
+	// the radius nudges outward and retries within the same slice. Only
 	// runs once #ptzField is actually visible, since offsetHeight reads 0
 	// inside a display:none subtree (same constraint layout() above has).
 	function scatterCards() {
 		if (!builtCards || !field.clientWidth) return;
 		var placed = [];
-		builtCards.forEach(function (card) {
+		var n = builtCards.length;
+		builtCards.forEach(function (card, index) {
 			var w = card.offsetWidth || CARD_W;
 			var h = card.offsetHeight;
 			var rand = mulberry32(hashSeed(card.dataset.seed));
-			var left, top, tries = 0, maxTries = 40, ok = false;
+			var baseAngle = (index / n) * Math.PI * 2;
+			var sliceWidth = (Math.PI * 2) / n;
+			var left, top, tries = 0, maxTries = 30, ok = false;
 			while (tries < maxTries && !ok) {
-				var radius = (tries / maxTries) * 420;
-				var angle = rand() * Math.PI * 2;
+				var jitter = (rand() - 0.5) * sliceWidth * 0.6;
+				var angle = baseAngle + jitter;
+				var radius = 150 + rand() * 220 + tries * 12;
 				var cx = CENTER_X + Math.cos(angle) * radius;
 				var cy = CENTER_Y + Math.sin(angle) * radius * 0.6; // field is wider than tall
 				left = Math.max(MARGIN, Math.min(FIELD_W - MARGIN - w, cx - w / 2));
