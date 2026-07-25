@@ -251,17 +251,18 @@
 	else deskPhoto.addEventListener("load", layout);
 
 	// --- job cards: built from js/ptz-cards.json (generated from
-	// ptz-jobs/*.json, see scripts/build_ptz_cards.py), positioned by
-	// packing them into columns based on their real rendered height ---
+	// ptz-jobs/*.json, see scripts/build_ptz_cards.py), scattered around the
+	// field's center with a little randomness -- mirrors how the cards used
+	// to be hand-placed (spread out across the desk, not a tidy grid), but
+	// computed instead of hand-measured.
 
-	// grid constants: FIELD_W matches .ptz-field's width in style.css, CARD_W
-	// matches .ptz-card's width -- same "mirror the CSS" pattern as NATURAL_W
-	// etc. above. Height is deliberately NOT fixed; each card's real height
-	// (thumb + title + meta + however many lines its own description wraps
-	// to) is measured after the browser lays it out, and used to pack cards
-	// into the shortest column so far (classic masonry), instead of guessing.
-	var FIELD_W = 1400, CARD_W = 240, MARGIN = 40, GUTTER = 40;
-	var COLUMNS = Math.floor((FIELD_W - 2 * MARGIN + GUTTER) / (CARD_W + GUTTER));
+	// FIELD_W/H match .ptz-field's size in style.css, CARD_W is a fallback
+	// for the width estimate (real width/height are measured post-layout,
+	// same "mirror the CSS" pattern as NATURAL_W etc. above). Cards scatter
+	// around the camera's default aim point (state.panX/panY, declared
+	// above) so the initial view opens roughly centered on them.
+	var FIELD_W = 1400, FIELD_H = 900, CARD_W = 240, MARGIN = 40, GUTTER = 36;
+	var CENTER_X = state.panX, CENTER_Y = state.panY;
 	var builtCards = null;
 
 	function buildCard(job) {
@@ -284,42 +285,77 @@
 		return card;
 	}
 
-	// packs already-built (but unpositioned) cards into columns by measured
-	// height -- only runs once #ptzField is actually visible, since
-	// offsetHeight reads 0 inside a display:none subtree (same constraint
-	// layout() above has, for the same reason)
-	function packCards() {
+	// small deterministic PRNG (mulberry32) seeded from a hash of the card's
+	// own title -- not array index or load order -- so a given job always
+	// scatters to roughly the same spot on every visit, and adding/removing
+	// a *different* job never reshuffles the ones already placed.
+	function hashSeed(str) {
+		var h = 0;
+		for (var i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+		return h;
+	}
+	function mulberry32(seed) {
+		return function () {
+			seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+			var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	}
+
+	// scatters already-built (but unpositioned) cards around CENTER_X/Y:
+	// picks a random angle at a growing radius (starting near-center, wider
+	// on each retry) and rejects positions that'd overlap an already-placed
+	// card, same rejection-sampling idea as Poisson-disc scattering. Only
+	// runs once #ptzField is actually visible, since offsetHeight reads 0
+	// inside a display:none subtree (same constraint layout() above has).
+	function scatterCards() {
 		if (!builtCards || !field.clientWidth) return;
-		var colHeights = new Array(COLUMNS).fill(MARGIN);
+		var placed = [];
 		builtCards.forEach(function (card) {
-			var col = colHeights.indexOf(Math.min.apply(null, colHeights));
-			card.style.left = (MARGIN + col * (CARD_W + GUTTER)) + "px";
-			card.style.top = colHeights[col] + "px";
-			colHeights[col] = colHeights[col] + card.offsetHeight + GUTTER;
+			var w = card.offsetWidth || CARD_W;
+			var h = card.offsetHeight;
+			var rand = mulberry32(hashSeed(card.dataset.seed));
+			var left, top, tries = 0, maxTries = 40, ok = false;
+			while (tries < maxTries && !ok) {
+				var radius = (tries / maxTries) * 420;
+				var angle = rand() * Math.PI * 2;
+				var cx = CENTER_X + Math.cos(angle) * radius;
+				var cy = CENTER_Y + Math.sin(angle) * radius * 0.6; // field is wider than tall
+				left = Math.max(MARGIN, Math.min(FIELD_W - MARGIN - w, cx - w / 2));
+				top = Math.max(MARGIN, Math.min(FIELD_H - MARGIN - h, cy - h / 2));
+				ok = !placed.some(function (p) {
+					return left < p.left + p.w + GUTTER && left + w + GUTTER > p.left &&
+						top < p.top + p.h + GUTTER && top + h + GUTTER > p.top;
+				});
+				tries++;
+			}
+			card.style.left = left + "px";
+			card.style.top = top + "px";
+			placed.push({ left: left, top: top, w: w, h: h });
 		});
-		if (Math.max.apply(null, colHeights) > 900) {
-			console.warn("ptz cards: packed height exceeds the 900px field -- some cards may sit near the edge of the pannable range");
-		}
 	}
 
 	fetch("js/ptz-cards.json").then(function (r) { return r.json(); }).then(function (jobs) {
 		builtCards = jobs.map(function (job) {
 			var card = buildCard(job);
+			card.dataset.seed = job.title;
 			field.appendChild(card);
 			return card;
 		});
-		packCards();
+		scatterCards();
 	});
 
-	// re-run layout/packing once the PTZ tab actually becomes visible -- it's
-	// display:none until then, so clientWidth reads 0 and layout()/packCards()
-	// no-op. Listens for script.js's "tabactivated" event rather than a click
-	// on the tab link specifically, so a direct #ptz link on page load (which
-	// activates the tab without any click happening) still triggers this.
+	// re-run layout/scatter once the PTZ tab actually becomes visible --
+	// it's display:none until then, so clientWidth reads 0 and
+	// layout()/scatterCards() no-op. Listens for script.js's "tabactivated"
+	// event rather than a click on the tab link specifically, so a direct
+	// #ptz link on page load (which activates the tab without any click
+	// happening) still triggers this.
 	document.addEventListener("tabactivated", function (e) {
 		if (e.detail.target === "ptz") {
 			requestAnimationFrame(layout);
-			packCards();
+			scatterCards();
 		}
 	});
 })();
