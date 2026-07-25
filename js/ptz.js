@@ -329,7 +329,7 @@
 			while (tries < maxTries && !ok) {
 				var jitter = (rand() - 0.5) * sliceWidth * 0.6;
 				var angle = baseAngle + jitter;
-				var radius = 150 + rand() * 220 + tries * 12;
+				var radius = 240 + rand() * 260 + tries * 14;
 				var cx = CENTER_X + Math.cos(angle) * radius;
 				var cy = CENTER_Y + Math.sin(angle) * radius * 0.6; // field is wider than tall
 				left = Math.max(MARGIN, Math.min(FIELD_W - MARGIN - w, cx - w / 2));
