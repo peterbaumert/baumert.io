@@ -1,0 +1,20 @@
+[
+  {
+    "title": "SAP Arena",
+    "meta": "2011–present · Mannheim",
+    "thumbnail": "saparena.png",
+    "description": "LED board operation, advertising spot coordination, and multi-camera remote operation."
+  },
+  {
+    "title": "Staplercup",
+    "meta": "2025",
+    "thumbnail": "staplercup.png",
+    "description": "Remote PTZ camera operation at Staplercup."
+  },
+  {
+    "title": "Pfälzische Weinkönigin",
+    "meta": "2025–2026 · Neustadt",
+    "thumbnail": "weinkoenigin.png",
+    "description": "Remote camera work for OK Weinstraße's broadcast of the Palatinate Wine Queen election."
+  }
+]

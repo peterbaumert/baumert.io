@@ -250,14 +250,76 @@
 	if (deskPhoto.complete) layout();
 	else deskPhoto.addEventListener("load", layout);
 
-	// re-run layout once the PTZ tab actually becomes visible -- it's
-	// display:none until then, so clientWidth reads 0 and layout() no-ops.
-	// Listens for script.js's "tabactivated" event rather than a click on
-	// the tab link specifically, so a direct #ptz link on page load (which
+	// --- job cards: built from js/ptz-cards.json (generated from
+	// ptz-jobs/*.json, see scripts/build_ptz_cards.py), positioned by
+	// packing them into columns based on their real rendered height ---
+
+	// grid constants: FIELD_W matches .ptz-field's width in style.css, CARD_W
+	// matches .ptz-card's width -- same "mirror the CSS" pattern as NATURAL_W
+	// etc. above. Height is deliberately NOT fixed; each card's real height
+	// (thumb + title + meta + however many lines its own description wraps
+	// to) is measured after the browser lays it out, and used to pack cards
+	// into the shortest column so far (classic masonry), instead of guessing.
+	var FIELD_W = 1400, CARD_W = 240, MARGIN = 40, GUTTER = 40;
+	var COLUMNS = Math.floor((FIELD_W - 2 * MARGIN + GUTTER) / (CARD_W + GUTTER));
+	var builtCards = null;
+
+	function buildCard(job) {
+		var card = document.createElement("div");
+		card.className = "ptz-card";
+		var thumb = document.createElement("div");
+		thumb.className = "ptz-thumb";
+		thumb.style.backgroundImage = "url(img/ptz/" + job.thumbnail + ")";
+		var h3 = document.createElement("h3");
+		h3.textContent = job.title;
+		var meta = document.createElement("div");
+		meta.className = "ptz-meta";
+		meta.textContent = job.meta;
+		var desc = document.createElement("p");
+		desc.textContent = job.description;
+		card.appendChild(thumb);
+		card.appendChild(h3);
+		card.appendChild(meta);
+		card.appendChild(desc);
+		return card;
+	}
+
+	// packs already-built (but unpositioned) cards into columns by measured
+	// height -- only runs once #ptzField is actually visible, since
+	// offsetHeight reads 0 inside a display:none subtree (same constraint
+	// layout() above has, for the same reason)
+	function packCards() {
+		if (!builtCards || !field.clientWidth) return;
+		var colHeights = new Array(COLUMNS).fill(MARGIN);
+		builtCards.forEach(function (card) {
+			var col = colHeights.indexOf(Math.min.apply(null, colHeights));
+			card.style.left = (MARGIN + col * (CARD_W + GUTTER)) + "px";
+			card.style.top = colHeights[col] + "px";
+			colHeights[col] = colHeights[col] + card.offsetHeight + GUTTER;
+		});
+		if (Math.max.apply(null, colHeights) > 900) {
+			console.warn("ptz cards: packed height exceeds the 900px field -- some cards may sit near the edge of the pannable range");
+		}
+	}
+
+	fetch("js/ptz-cards.json").then(function (r) { return r.json(); }).then(function (jobs) {
+		builtCards = jobs.map(function (job) {
+			var card = buildCard(job);
+			field.appendChild(card);
+			return card;
+		});
+		packCards();
+	});
+
+	// re-run layout/packing once the PTZ tab actually becomes visible -- it's
+	// display:none until then, so clientWidth reads 0 and layout()/packCards()
+	// no-op. Listens for script.js's "tabactivated" event rather than a click
+	// on the tab link specifically, so a direct #ptz link on page load (which
 	// activates the tab without any click happening) still triggers this.
 	document.addEventListener("tabactivated", function (e) {
 		if (e.detail.target === "ptz") {
 			requestAnimationFrame(layout);
+			packCards();
 		}
 	});
 })();
