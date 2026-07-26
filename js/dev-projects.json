@@ -29,8 +29,7 @@
     "repoUrl": "https://github.com/peterbaumert/streamdeck-vmix-plugin",
     "badges": {
       "stars": true,
-      "version": true,
-      "ci": "build-and-release.yml"
+      "version": true
     }
   }
 ]

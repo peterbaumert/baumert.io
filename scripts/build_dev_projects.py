@@ -34,10 +34,14 @@ def load_badges(filename, project):
                 sys.exit("{}: badges.{} must be true/false".format(filename, field))
             if badges[field]:
                 result[field] = True
-    if "ci" in badges and badges["ci"] is not None:
-        if not isinstance(badges["ci"], str) or not badges["ci"].strip():
-            sys.exit("{}: badges.ci must be a non-empty workflow filename".format(filename))
-        result["ci"] = badges["ci"]
+    if "ci" in badges:
+        ci = badges["ci"]
+        if ci in (False, None):
+            pass  # explicitly disabled, same as omitting the key
+        elif not isinstance(ci, str) or not ci.strip():
+            sys.exit("{}: badges.ci must be a non-empty workflow filename, or false to disable".format(filename))
+        else:
+            result["ci"] = ci
     return result
 
 

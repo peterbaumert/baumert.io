@@ -5,6 +5,6 @@
   "badges": {
     "stars": true,
     "version": true,
-    "ci": "build-and-release.yml"
+    "ci": false
   }
 }
