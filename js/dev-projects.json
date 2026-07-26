@@ -4,6 +4,10 @@
     "description": "Live broadcast graphics controller for Adler Mannheim (DEL ice hockey) — bridges an operator to vMix over TCP to trigger overlays and lower-thirds during games."
   },
   {
+    "name": "battlemap.wtf",
+    "description": "Pokémon GO live map and raid tracker with Telegram alerts (PHP/MySQL, Mapbox). No longer live — retired in 2021."
+  },
+  {
     "name": "netbox-device-view",
     "description": "NetBox plugin rendering a device's physical ports and interfaces as a visual grid.",
     "repoUrl": "https://github.com/peterbaumert/netbox-device-view",
