@@ -174,6 +174,24 @@ body.ptz-active {
   gap: 20px;
 }
 
+/* Dev tab: projects grouped into Public/Private/Work sections, each its
+   own .projects-grid -- .category-label is deliberately smaller/lighter
+   than the page-level .section-label ("Dev projects") it sits under, so
+   the hierarchy reads clearly instead of two identical-looking labels
+   stacked on top of each other. */
+.category-section {
+  margin-bottom: 32px;
+}
+
+.category-section:last-child {
+  margin-bottom: 0;
+}
+
+.category-label {
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
 .project-desc {
   font-size: 14px;
   color: var(--color-ink-muted);

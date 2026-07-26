@@ -13,6 +13,13 @@ REQUIRED_FIELDS = ("name", "description")
 # and badges can't resolve without auth for a private repo either, so a
 # missing repoUrl means "no link, no badges", not "forgot to fill this in").
 
+# category groups cards into sections on the site (Public/Private/Work).
+# Optional -- if omitted, inferred from repoUrl (public if set, else
+# private) so existing files without it keep working, but every output
+# entry always gets a resolved category so the JS side never has to
+# duplicate this inference logic.
+CATEGORIES = ("public", "private", "work")
+
 # badges is optional -- a project with no "badges" key (or an empty object)
 # shows none. Each sub-field independently opts a single badge in: stars/
 # version are booleans, ci is the workflow's bare filename (there's no way
@@ -73,6 +80,14 @@ def load_project(filename):
             result["badges"] = badges
     elif "badges" in project and project["badges"]:
         sys.exit("{}: 'badges' requires 'repoUrl' to be set".format(filename))
+
+    category = project.get("category")
+    if category is not None:
+        if category not in CATEGORIES:
+            sys.exit("{}: category must be one of {}".format(filename, CATEGORIES))
+        result["category"] = category
+    else:
+        result["category"] = "public" if repo_url is not None else "private"
 
     return result
 

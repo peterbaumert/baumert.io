@@ -1,4 +1,5 @@
 {
   "name": "battlemap.wtf",
-  "description": "Pokémon GO live map and raid tracker with Telegram alerts (PHP/MySQL, Mapbox). No longer live — retired in 2021."
+  "description": "Pokémon GO live map and raid tracker with Telegram alerts (PHP/MySQL, Mapbox). No longer live — retired in 2021.",
+  "category": "private"
 }

@@ -45,6 +45,7 @@ Each card on the Dev tab is defined by a file in `dev-projects/`, e.g.:
 {
   "name": "netbox-device-view",
   "description": "NetBox plugin rendering a device's physical ports and interfaces as a visual grid.",
+  "category": "public",
   "repoUrl": "https://github.com/peterbaumert/netbox-device-view",
   "badges": {
     "stars": true,
@@ -54,13 +55,15 @@ Each card on the Dev tab is defined by a file in `dev-projects/`, e.g.:
 }
 ```
 
-Cards render in filename-sort order — rename files (e.g. `01-foo.json`) to reorder them. Same pipeline as the PTZ cards, just simpler (it's a plain CSS grid, no position/layout logic needed): a PR-time validation workflow, a push-to-`main` build workflow that regenerates and commits `js/dev-projects.json` via `scripts/build_dev_projects.py`, and `js/script.js` fetching it at page load.
+Cards render in filename-sort order within their category — rename files (e.g. `01-foo.json`) to reorder them. Same pipeline as the PTZ cards, just simpler (it's a plain CSS grid, no position/layout logic needed): a PR-time validation workflow, a push-to-`main` build workflow that regenerates and commits `js/dev-projects.json` via `scripts/build_dev_projects.py`, and `js/script.js` fetching it at page load.
+
+**`category`** groups cards into labeled sections on the site — `"public"`, `"private"`, or `"work"`, always shown in that order, with a category simply not rendering a section if nothing's tagged into it yet (e.g. `"work"` today). Optional: if omitted, inferred as `"public"` when `repoUrl` is set, `"private"` otherwise — but set it explicitly, same reasoning as `badges` below.
 
 **`repoUrl` is optional** — omit it for a private repo (e.g. `AdlerController`) and the card renders with just a name and description, no "view repo" link and no badges (a private repo's page/badges wouldn't resolve for visitors anyway).
 
 **`badges` is optional and per-badge opt-in**, only meaningful when `repoUrl` is set (the build fails if `badges` is present without it):
 - `stars`/`version` (`true`/`false`) — derived automatically from `repoUrl` via shields.io's generic GitHub endpoints, no extra info needed.
-- `ci` — the target repo's workflow **filename** (e.g. `"test.yml"`, `"ci.yml"`), not its display name. There's no way to derive this automatically since it varies per repo; find it via that repo's Actions tab or `gh api repos/<owner>/<repo>/actions/workflows`.
+- `ci` — the target repo's workflow **filename** (e.g. `"test.yml"`, `"ci.yml"`), not its display name, or `false` to explicitly disable it (e.g. a repo whose only workflow doesn't run on regular pushes, so the badge would just permanently show "no status"). There's no way to derive the filename automatically since it varies per repo; find it via that repo's Actions tab or `gh api repos/<owner>/<repo>/actions/workflows`.
 
 To regenerate locally: `python3 scripts/build_dev_projects.py`.
 

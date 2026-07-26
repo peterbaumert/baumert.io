@@ -1,6 +1,7 @@
 {
   "name": "netbox-device-view",
   "description": "NetBox plugin rendering a device's physical ports and interfaces as a visual grid.",
+  "category": "public",
   "repoUrl": "https://github.com/peterbaumert/netbox-device-view",
   "badges": {
     "stars": true,

@@ -1,4 +1,5 @@
 {
   "name": "Infrastructure as Code",
-  "description": "Personal infrastructure — Kubernetes, virtualization, networking — managed as code with Terraform and Ansible."
+  "description": "Personal infrastructure — Kubernetes, virtualization, networking — managed as code with Terraform and Ansible.",
+  "category": "private"
 }

@@ -1,15 +1,18 @@
 [
   {
     "name": "AdlerController",
-    "description": "Live broadcast graphics controller for Adler Mannheim (DEL ice hockey) — bridges an operator to vMix over TCP to trigger overlays and lower-thirds during games."
+    "description": "Live broadcast graphics controller for Adler Mannheim (DEL ice hockey) — bridges an operator to vMix over TCP to trigger overlays and lower-thirds during games.",
+    "category": "private"
   },
   {
     "name": "battlemap.wtf",
-    "description": "Pokémon GO live map and raid tracker with Telegram alerts (PHP/MySQL, Mapbox). No longer live — retired in 2021."
+    "description": "Pokémon GO live map and raid tracker with Telegram alerts (PHP/MySQL, Mapbox). No longer live — retired in 2021.",
+    "category": "private"
   },
   {
     "name": "Infrastructure as Code",
-    "description": "Personal infrastructure — Kubernetes, virtualization, networking — managed as code with Terraform and Ansible."
+    "description": "Personal infrastructure — Kubernetes, virtualization, networking — managed as code with Terraform and Ansible.",
+    "category": "private"
   },
   {
     "name": "netbox-device-view",
@@ -19,7 +22,8 @@
       "stars": true,
       "version": true,
       "ci": "test.yml"
-    }
+    },
+    "category": "public"
   },
   {
     "name": "netbox-widget-chart",
@@ -29,7 +33,8 @@
       "stars": true,
       "version": true,
       "ci": "ci.yml"
-    }
+    },
+    "category": "public"
   },
   {
     "name": "streamdeck-vmix-plugin",
@@ -38,6 +43,7 @@
     "badges": {
       "stars": true,
       "version": true
-    }
+    },
+    "category": "public"
   }
 ]

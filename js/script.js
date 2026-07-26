@@ -89,82 +89,117 @@ document.addEventListener("DOMContentLoaded", function () {
 	// dev-projects/*.json, see scripts/build_dev_projects.py). Unlike the
 	// PTZ cards, this is a plain CSS grid -- no position/measurement needed,
 	// so it can render as soon as the fetch resolves regardless of whether
-	// the Dev tab is currently visible.
+	// the Dev tab is currently visible. Grouped into Public/Private/Work
+	// sections (see buildDevProjectsSections below) rather than one flat
+	// grid, so a visitor can tell at a glance which is which.
 	var projectsGrid = document.getElementById("devProjectsGrid");
+
+	function buildProjectCard(project) {
+		var card = document.createElement("div");
+		card.className = "card";
+
+		var header = document.createElement("div");
+		header.className = "card-header mono";
+		header.textContent = project.name;
+		card.appendChild(header);
+
+		var body = document.createElement("div");
+		body.className = "card-body";
+
+		var desc = document.createElement("p");
+		desc.className = "project-desc";
+		desc.textContent = project.description;
+		body.appendChild(desc);
+
+		// repoUrl is omitted entirely for private repos (see
+		// dev-projects/*.json) -- no public page to link to, and
+		// badges can't resolve without auth either, so those
+		// projects only ever get a name + description, no link,
+		// no badges section at all.
+		if (project.repoUrl) {
+			var link = document.createElement("a");
+			link.className = "repo-link";
+			link.href = project.repoUrl;
+			link.target = "_blank";
+			link.rel = "noopener";
+			link.textContent = "view repo →";
+			body.appendChild(link);
+		}
+
+		// badges are opt-in per project (see dev-projects/*.json's
+		// "badges" field) -- stars/version derive from repoUrl
+		// alone via shields.io's generic GitHub endpoints, but ci
+		// needs the actual workflow filename (badges.ci), which
+		// varies per repo and can't be derived from anything else
+		var badges = project.badges;
+		var repoMatch = project.repoUrl && /^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/?$/.exec(project.repoUrl);
+		if (badges && repoMatch) {
+			var owner = repoMatch[1], repo = repoMatch[2];
+			var badgeRow = document.createElement("div");
+			badgeRow.className = "repo-badges";
+
+			function addBadge(src, alt) {
+				var img = document.createElement("img");
+				img.src = src;
+				img.alt = alt;
+				img.loading = "lazy";
+				badgeRow.appendChild(img);
+			}
+
+			if (badges.stars) {
+				addBadge("https://img.shields.io/github/stars/" + owner + "/" + repo, "GitHub stars");
+			}
+			if (badges.version) {
+				addBadge("https://img.shields.io/github/v/release/" + owner + "/" + repo, "latest release");
+			}
+			if (badges.ci) {
+				addBadge("https://github.com/" + owner + "/" + repo + "/actions/workflows/" + badges.ci + "/badge.svg", "CI status");
+			}
+
+			if (badgeRow.childNodes.length) body.appendChild(badgeRow);
+		}
+
+		card.appendChild(body);
+		return card;
+	}
+
+	// fixed display order regardless of how projects are sorted/loaded --
+	// a category with zero projects (e.g. "work" until something is
+	// actually tagged that way) just doesn't get a section at all
+	var CATEGORY_ORDER = ["public", "private", "work"];
+	var CATEGORY_LABELS = { public: "Public", private: "Private", work: "Work" };
+
+	function buildDevProjectsSections(projects) {
+		var frag = document.createDocumentFragment();
+		CATEGORY_ORDER.forEach(function (category) {
+			var inCategory = projects.filter(function (p) { return p.category === category; });
+			if (!inCategory.length) return;
+
+			var section = document.createElement("div");
+			section.className = "category-section";
+
+			var label = document.createElement("div");
+			label.className = "section-label category-label";
+			label.textContent = CATEGORY_LABELS[category];
+			section.appendChild(label);
+
+			var grid = document.createElement("div");
+			grid.className = "projects-grid";
+			inCategory.forEach(function (project) {
+				grid.appendChild(buildProjectCard(project));
+			});
+			section.appendChild(grid);
+
+			frag.appendChild(section);
+		});
+		return frag;
+	}
+
 	if (projectsGrid) {
 		fetch("js/dev-projects.json")
 			.then(function (r) { return r.json(); })
 			.then(function (projects) {
-				var frag = document.createDocumentFragment();
-				projects.forEach(function (project) {
-					var card = document.createElement("div");
-					card.className = "card";
-
-					var header = document.createElement("div");
-					header.className = "card-header mono";
-					header.textContent = project.name;
-					card.appendChild(header);
-
-					var body = document.createElement("div");
-					body.className = "card-body";
-
-					var desc = document.createElement("p");
-					desc.className = "project-desc";
-					desc.textContent = project.description;
-					body.appendChild(desc);
-
-					// repoUrl is omitted entirely for private repos (see
-					// dev-projects/*.json) -- no public page to link to, and
-					// badges can't resolve without auth either, so those
-					// projects only ever get a name + description, no link,
-					// no badges section at all.
-					if (project.repoUrl) {
-						var link = document.createElement("a");
-						link.className = "repo-link";
-						link.href = project.repoUrl;
-						link.target = "_blank";
-						link.rel = "noopener";
-						link.textContent = "view repo →";
-						body.appendChild(link);
-					}
-
-					// badges are opt-in per project (see dev-projects/*.json's
-					// "badges" field) -- stars/version derive from repoUrl
-					// alone via shields.io's generic GitHub endpoints, but ci
-					// needs the actual workflow filename (badges.ci), which
-					// varies per repo and can't be derived from anything else
-					var badges = project.badges;
-					var repoMatch = project.repoUrl && /^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/?$/.exec(project.repoUrl);
-					if (badges && repoMatch) {
-						var owner = repoMatch[1], repo = repoMatch[2];
-						var badgeRow = document.createElement("div");
-						badgeRow.className = "repo-badges";
-
-						function addBadge(src, alt) {
-							var img = document.createElement("img");
-							img.src = src;
-							img.alt = alt;
-							img.loading = "lazy";
-							badgeRow.appendChild(img);
-						}
-
-						if (badges.stars) {
-							addBadge("https://img.shields.io/github/stars/" + owner + "/" + repo, "GitHub stars");
-						}
-						if (badges.version) {
-							addBadge("https://img.shields.io/github/v/release/" + owner + "/" + repo, "latest release");
-						}
-						if (badges.ci) {
-							addBadge("https://github.com/" + owner + "/" + repo + "/actions/workflows/" + badges.ci + "/badge.svg", "CI status");
-						}
-
-						if (badgeRow.childNodes.length) body.appendChild(badgeRow);
-					}
-
-					card.appendChild(body);
-					frag.appendChild(card);
-				});
-				projectsGrid.appendChild(frag);
+				projectsGrid.appendChild(buildDevProjectsSections(projects));
 			});
 	}
 });
