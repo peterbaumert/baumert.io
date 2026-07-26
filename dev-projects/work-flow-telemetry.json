@@ -1,0 +1,5 @@
+{
+  "name": "Network Flow Telemetry",
+  "description": "NetFlow/IPFIX/sFlow ingestion pipeline using an open-source flow collector, ClickHouse for time-series storage, and Grafana for real-time traffic dashboards with CMDB-based IP enrichment.",
+  "category": "work"
+}

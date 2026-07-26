@@ -1,0 +1,5 @@
+{
+  "name": "Infrastructure as Code",
+  "description": "Enterprise infrastructure automation — private cloud, container orchestration, network fabric, and security — declaratively managed with Terraform, Terragrunt, and Ansible at scale.",
+  "category": "work"
+}

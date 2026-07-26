@@ -1,0 +1,5 @@
+{
+  "name": "ITO Portal",
+  "description": "Django-based internal IT operations portal — VM lifecycle management, approval workflows, and automated provisioning pipelines integrated with CMDB, virtualization, and backup APIs.",
+  "category": "work"
+}
