@@ -52,7 +52,7 @@
     "category": "work"
   },
   {
-    "name": "Infrastructure as Code",
+    "name": "Enterprise IaC",
     "description": "Enterprise infrastructure automation — private cloud, container orchestration, network fabric, and security — declaratively managed with Terraform, Terragrunt, and Ansible at scale.",
     "category": "work"
   },
