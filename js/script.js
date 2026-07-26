@@ -113,13 +113,53 @@ document.addEventListener("DOMContentLoaded", function () {
 					desc.textContent = project.description;
 					body.appendChild(desc);
 
-					var link = document.createElement("a");
-					link.className = "repo-link";
-					link.href = project.repoUrl;
-					link.target = "_blank";
-					link.rel = "noopener";
-					link.textContent = "view repo →";
-					body.appendChild(link);
+					// repoUrl is omitted entirely for private repos (see
+					// dev-projects/*.json) -- no public page to link to, and
+					// badges can't resolve without auth either, so those
+					// projects only ever get a name + description, no link,
+					// no badges section at all.
+					if (project.repoUrl) {
+						var link = document.createElement("a");
+						link.className = "repo-link";
+						link.href = project.repoUrl;
+						link.target = "_blank";
+						link.rel = "noopener";
+						link.textContent = "view repo →";
+						body.appendChild(link);
+					}
+
+					// badges are opt-in per project (see dev-projects/*.json's
+					// "badges" field) -- stars/version derive from repoUrl
+					// alone via shields.io's generic GitHub endpoints, but ci
+					// needs the actual workflow filename (badges.ci), which
+					// varies per repo and can't be derived from anything else
+					var badges = project.badges;
+					var repoMatch = project.repoUrl && /^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/?$/.exec(project.repoUrl);
+					if (badges && repoMatch) {
+						var owner = repoMatch[1], repo = repoMatch[2];
+						var badgeRow = document.createElement("div");
+						badgeRow.className = "repo-badges";
+
+						function addBadge(src, alt) {
+							var img = document.createElement("img");
+							img.src = src;
+							img.alt = alt;
+							img.loading = "lazy";
+							badgeRow.appendChild(img);
+						}
+
+						if (badges.stars) {
+							addBadge("https://img.shields.io/github/stars/" + owner + "/" + repo, "GitHub stars");
+						}
+						if (badges.version) {
+							addBadge("https://img.shields.io/github/v/release/" + owner + "/" + repo, "latest release");
+						}
+						if (badges.ci) {
+							addBadge("https://github.com/" + owner + "/" + repo + "/actions/workflows/" + badges.ci + "/badge.svg", "CI status");
+						}
+
+						if (badgeRow.childNodes.length) body.appendChild(badgeRow);
+					}
 
 					card.appendChild(body);
 					frag.appendChild(card);

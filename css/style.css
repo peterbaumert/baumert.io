@@ -193,6 +193,18 @@ body.ptz-active {
   text-decoration: underline;
 }
 
+.repo-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.repo-badges img {
+  height: 20px;
+  display: block;
+}
+
 .badges {
   display: flex;
   gap: 10px;

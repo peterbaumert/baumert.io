@@ -1,0 +1,4 @@
+{
+  "name": "AdlerController",
+  "description": "Live broadcast graphics controller for Adler Mannheim (DEL ice hockey) — bridges an operator to vMix over TCP to trigger overlays and lower-thirds during games."
+}

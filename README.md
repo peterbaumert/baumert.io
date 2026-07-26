@@ -45,11 +45,22 @@ Each card on the Dev tab is defined by a file in `dev-projects/`, e.g.:
 {
   "name": "netbox-device-view",
   "description": "NetBox plugin rendering a device's physical ports and interfaces as a visual grid.",
-  "repoUrl": "https://github.com/peterbaumert/netbox-device-view"
+  "repoUrl": "https://github.com/peterbaumert/netbox-device-view",
+  "badges": {
+    "stars": true,
+    "version": true,
+    "ci": "test.yml"
+  }
 }
 ```
 
 Cards render in filename-sort order — rename files (e.g. `01-foo.json`) to reorder them. Same pipeline as the PTZ cards, just simpler (it's a plain CSS grid, no position/layout logic needed): a PR-time validation workflow, a push-to-`main` build workflow that regenerates and commits `js/dev-projects.json` via `scripts/build_dev_projects.py`, and `js/script.js` fetching it at page load.
+
+**`repoUrl` is optional** — omit it for a private repo (e.g. `AdlerController`) and the card renders with just a name and description, no "view repo" link and no badges (a private repo's page/badges wouldn't resolve for visitors anyway).
+
+**`badges` is optional and per-badge opt-in**, only meaningful when `repoUrl` is set (the build fails if `badges` is present without it):
+- `stars`/`version` (`true`/`false`) — derived automatically from `repoUrl` via shields.io's generic GitHub endpoints, no extra info needed.
+- `ci` — the target repo's workflow **filename** (e.g. `"test.yml"`, `"ci.yml"`), not its display name. There's no way to derive this automatically since it varies per repo; find it via that repo's Actions tab or `gh api repos/<owner>/<repo>/actions/workflows`.
 
 To regenerate locally: `python3 scripts/build_dev_projects.py`.
 

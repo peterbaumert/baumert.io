@@ -7,7 +7,38 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECTS_DIR = os.path.join(REPO_ROOT, "dev-projects")
 OUT_PATH = os.path.join(REPO_ROOT, "js", "dev-projects.json")
 
-REQUIRED_FIELDS = ("name", "description", "repoUrl")
+REQUIRED_FIELDS = ("name", "description")
+
+# repoUrl is optional -- omit it for private repos (no public page to link to,
+# and badges can't resolve without auth for a private repo either, so a
+# missing repoUrl means "no link, no badges", not "forgot to fill this in").
+
+# badges is optional -- a project with no "badges" key (or an empty object)
+# shows none. Each sub-field independently opts a single badge in: stars/
+# version are booleans, ci is the workflow's bare filename (there's no way
+# to derive that from repoUrl -- it varies per repo and isn't guessable).
+BADGE_BOOL_FIELDS = ("stars", "version")
+
+
+def load_badges(filename, project):
+    badges = project.get("badges", {})
+    if badges in (None, {}):
+        return {}
+    if not isinstance(badges, dict):
+        sys.exit("{}: 'badges' must be an object".format(filename))
+
+    result = {}
+    for field in BADGE_BOOL_FIELDS:
+        if field in badges:
+            if not isinstance(badges[field], bool):
+                sys.exit("{}: badges.{} must be true/false".format(filename, field))
+            if badges[field]:
+                result[field] = True
+    if "ci" in badges and badges["ci"] is not None:
+        if not isinstance(badges["ci"], str) or not badges["ci"].strip():
+            sys.exit("{}: badges.ci must be a non-empty workflow filename".format(filename))
+        result["ci"] = badges["ci"]
+    return result
 
 
 def load_project(filename):
@@ -26,10 +57,20 @@ def load_project(filename):
         if not isinstance(value, str) or not value.strip():
             sys.exit("{}: missing or empty required field '{}'".format(filename, field))
 
-    if not project["repoUrl"].startswith("https://"):
-        sys.exit("{}: repoUrl must start with https://".format(filename))
+    result = {field: project[field] for field in REQUIRED_FIELDS}
 
-    return {field: project[field] for field in REQUIRED_FIELDS}
+    repo_url = project.get("repoUrl")
+    if repo_url is not None:
+        if not isinstance(repo_url, str) or not repo_url.startswith("https://"):
+            sys.exit("{}: repoUrl must start with https://".format(filename))
+        result["repoUrl"] = repo_url
+        badges = load_badges(filename, project)
+        if badges:
+            result["badges"] = badges
+    elif "badges" in project and project["badges"]:
+        sys.exit("{}: 'badges' requires 'repoUrl' to be set".format(filename))
+
+    return result
 
 
 def main():

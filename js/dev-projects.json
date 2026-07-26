@@ -1,17 +1,36 @@
 [
   {
+    "name": "AdlerController",
+    "description": "Live broadcast graphics controller for Adler Mannheim (DEL ice hockey) — bridges an operator to vMix over TCP to trigger overlays and lower-thirds during games."
+  },
+  {
     "name": "netbox-device-view",
     "description": "NetBox plugin rendering a device's physical ports and interfaces as a visual grid.",
-    "repoUrl": "https://github.com/peterbaumert/netbox-device-view"
+    "repoUrl": "https://github.com/peterbaumert/netbox-device-view",
+    "badges": {
+      "stars": true,
+      "version": true,
+      "ci": "test.yml"
+    }
   },
   {
     "name": "netbox-widget-chart",
     "description": "Configurable chart dashboard widget for NetBox.",
-    "repoUrl": "https://github.com/peterbaumert/netbox-widget-chart"
+    "repoUrl": "https://github.com/peterbaumert/netbox-widget-chart",
+    "badges": {
+      "stars": true,
+      "version": true,
+      "ci": "ci.yml"
+    }
   },
   {
     "name": "streamdeck-vmix-plugin",
     "description": "Stream Deck plugin to control vMix via its API.",
-    "repoUrl": "https://github.com/peterbaumert/streamdeck-vmix-plugin"
+    "repoUrl": "https://github.com/peterbaumert/streamdeck-vmix-plugin",
+    "badges": {
+      "stars": true,
+      "version": true,
+      "ci": "build-and-release.yml"
+    }
   }
 ]
