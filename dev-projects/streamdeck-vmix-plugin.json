@@ -1,0 +1,5 @@
+{
+  "name": "streamdeck-vmix-plugin",
+  "description": "Stream Deck plugin to control vMix via its API.",
+  "repoUrl": "https://github.com/peterbaumert/streamdeck-vmix-plugin"
+}

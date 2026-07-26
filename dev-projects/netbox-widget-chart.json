@@ -1,0 +1,5 @@
+{
+  "name": "netbox-widget-chart",
+  "description": "Configurable chart dashboard widget for NetBox.",
+  "repoUrl": "https://github.com/peterbaumert/netbox-widget-chart"
+}

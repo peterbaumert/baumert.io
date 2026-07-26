@@ -1,0 +1,17 @@
+[
+  {
+    "name": "netbox-device-view",
+    "description": "NetBox plugin rendering a device's physical ports and interfaces as a visual grid.",
+    "repoUrl": "https://github.com/peterbaumert/netbox-device-view"
+  },
+  {
+    "name": "netbox-widget-chart",
+    "description": "Configurable chart dashboard widget for NetBox.",
+    "repoUrl": "https://github.com/peterbaumert/netbox-widget-chart"
+  },
+  {
+    "name": "streamdeck-vmix-plugin",
+    "description": "Stream Deck plugin to control vMix via its API.",
+    "repoUrl": "https://github.com/peterbaumert/streamdeck-vmix-plugin"
+  }
+]

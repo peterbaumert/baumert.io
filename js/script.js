@@ -84,4 +84,47 @@ document.addEventListener("DOMContentLoaded", function () {
 			activateTab(hash, false);
 		}
 	});
+
+	// --- dev projects: built from js/dev-projects.json (generated from
+	// dev-projects/*.json, see scripts/build_dev_projects.py). Unlike the
+	// PTZ cards, this is a plain CSS grid -- no position/measurement needed,
+	// so it can render as soon as the fetch resolves regardless of whether
+	// the Dev tab is currently visible.
+	var projectsGrid = document.getElementById("devProjectsGrid");
+	if (projectsGrid) {
+		fetch("js/dev-projects.json")
+			.then(function (r) { return r.json(); })
+			.then(function (projects) {
+				var frag = document.createDocumentFragment();
+				projects.forEach(function (project) {
+					var card = document.createElement("div");
+					card.className = "card";
+
+					var header = document.createElement("div");
+					header.className = "card-header mono";
+					header.textContent = project.name;
+					card.appendChild(header);
+
+					var body = document.createElement("div");
+					body.className = "card-body";
+
+					var desc = document.createElement("p");
+					desc.className = "project-desc";
+					desc.textContent = project.description;
+					body.appendChild(desc);
+
+					var link = document.createElement("a");
+					link.className = "repo-link";
+					link.href = project.repoUrl;
+					link.target = "_blank";
+					link.rel = "noopener";
+					link.textContent = "view repo →";
+					body.appendChild(link);
+
+					card.appendChild(body);
+					frag.appendChild(card);
+				});
+				projectsGrid.appendChild(frag);
+			});
+	}
 });
