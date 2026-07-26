@@ -375,6 +375,7 @@ body.ptz-active {
   width: 1400px;
   height: 900px;
   transform-origin: 0 0;
+  touch-action: none;
 }
 
 .ptz-card {
@@ -387,6 +388,15 @@ body.ptz-active {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   font-size: 13px;
   line-height: 1.4;
+  /* touch-action:none on ancestors (.ptz-desk/.ptz-monitor) should already
+     cover this per the CSS touch-action "intersection" rule, and does on
+     Chromium -- but Safari/WebKit has known inconsistencies honoring that
+     inheritance for descendant elements (especially ones that, like these
+     cards, get inserted dynamically after load via js/ptz.js's fetch), so
+     dragging on a card could fall through to the browser's native page
+     scroll instead of the joystick/pan handling. Setting it explicitly
+     here removes the reliance on inheritance entirely. */
+  touch-action: none;
 }
 
 .ptz-thumb {

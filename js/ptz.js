@@ -250,14 +250,122 @@
 	if (deskPhoto.complete) layout();
 	else deskPhoto.addEventListener("load", layout);
 
-	// re-run layout once the PTZ tab actually becomes visible -- it's
-	// display:none until then, so clientWidth reads 0 and layout() no-ops.
-	// Listens for script.js's "tabactivated" event rather than a click on
-	// the tab link specifically, so a direct #ptz link on page load (which
-	// activates the tab without any click happening) still triggers this.
+	// --- job cards: built from js/ptz-cards.json (generated from
+	// ptz-jobs/*.json, see scripts/build_ptz_cards.py), scattered around the
+	// field's center with a little randomness -- mirrors how the cards used
+	// to be hand-placed (spread out across the desk, not a tidy grid), but
+	// computed instead of hand-measured.
+
+	// FIELD_W/H match .ptz-field's size in style.css, CARD_W is a fallback
+	// for the width estimate (real width/height are measured post-layout,
+	// same "mirror the CSS" pattern as NATURAL_W etc. above). Cards scatter
+	// around the camera's default aim point (state.panX/panY, declared
+	// above) so the initial view opens roughly centered on them.
+	var FIELD_W = 1400, FIELD_H = 900, CARD_W = 240, MARGIN = 40, GUTTER = 36;
+	var CENTER_X = state.panX, CENTER_Y = state.panY;
+	var builtCards = null;
+
+	function buildCard(job) {
+		var card = document.createElement("div");
+		card.className = "ptz-card";
+		var thumb = document.createElement("div");
+		thumb.className = "ptz-thumb";
+		thumb.style.backgroundImage = "url(img/ptz/" + job.thumbnail + ")";
+		var h3 = document.createElement("h3");
+		h3.textContent = job.title;
+		var meta = document.createElement("div");
+		meta.className = "ptz-meta";
+		meta.textContent = job.meta;
+		var desc = document.createElement("p");
+		desc.textContent = job.description;
+		card.appendChild(thumb);
+		card.appendChild(h3);
+		card.appendChild(meta);
+		card.appendChild(desc);
+		return card;
+	}
+
+	// small deterministic PRNG (mulberry32) seeded from a hash of the card's
+	// own title -- not array index or load order -- so a given job always
+	// scatters to roughly the same spot on every visit, and adding/removing
+	// a *different* job never reshuffles the ones already placed.
+	function hashSeed(str) {
+		var h = 0;
+		for (var i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+		return h;
+	}
+	function mulberry32(seed) {
+		return function () {
+			seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+			var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	}
+
+	// scatters already-built (but unpositioned) cards radially around
+	// CENTER_X/Y: each card gets its own evenly-spaced slice of the full
+	// circle (360deg / card count, in stable card order) so N cards always
+	// fan out in N different directions instead of random angles clustering
+	// together by chance (which is what a fully-random angle did with only
+	// a handful of cards). A little jitter within the slice plus a
+	// randomized radius keeps it from looking like a rigid polygon.
+	// Collision-avoidance is a fallback, not the primary driver of
+	// direction: if a jittered angle still overlaps an already-placed card,
+	// the radius nudges outward and retries within the same slice. Only
+	// runs once #ptzField is actually visible, since offsetHeight reads 0
+	// inside a display:none subtree (same constraint layout() above has).
+	function scatterCards() {
+		if (!builtCards || !field.clientWidth) return;
+		var placed = [];
+		var n = builtCards.length;
+		builtCards.forEach(function (card, index) {
+			var w = card.offsetWidth || CARD_W;
+			var h = card.offsetHeight;
+			var rand = mulberry32(hashSeed(card.dataset.seed));
+			var baseAngle = (index / n) * Math.PI * 2;
+			var sliceWidth = (Math.PI * 2) / n;
+			var left, top, tries = 0, maxTries = 30, ok = false;
+			while (tries < maxTries && !ok) {
+				var jitter = (rand() - 0.5) * sliceWidth * 0.6;
+				var angle = baseAngle + jitter;
+				var radius = 240 + rand() * 260 + tries * 14;
+				var cx = CENTER_X + Math.cos(angle) * radius;
+				var cy = CENTER_Y + Math.sin(angle) * radius * 0.6; // field is wider than tall
+				left = Math.max(MARGIN, Math.min(FIELD_W - MARGIN - w, cx - w / 2));
+				top = Math.max(MARGIN, Math.min(FIELD_H - MARGIN - h, cy - h / 2));
+				ok = !placed.some(function (p) {
+					return left < p.left + p.w + GUTTER && left + w + GUTTER > p.left &&
+						top < p.top + p.h + GUTTER && top + h + GUTTER > p.top;
+				});
+				tries++;
+			}
+			card.style.left = left + "px";
+			card.style.top = top + "px";
+			placed.push({ left: left, top: top, w: w, h: h });
+		});
+	}
+
+	fetch("js/ptz-cards.json").then(function (r) { return r.json(); }).then(function (jobs) {
+		builtCards = jobs.map(function (job) {
+			var card = buildCard(job);
+			card.dataset.seed = job.title;
+			field.appendChild(card);
+			return card;
+		});
+		scatterCards();
+	});
+
+	// re-run layout/scatter once the PTZ tab actually becomes visible --
+	// it's display:none until then, so clientWidth reads 0 and
+	// layout()/scatterCards() no-op. Listens for script.js's "tabactivated"
+	// event rather than a click on the tab link specifically, so a direct
+	// #ptz link on page load (which activates the tab without any click
+	// happening) still triggers this.
 	document.addEventListener("tabactivated", function (e) {
 		if (e.detail.target === "ptz") {
 			requestAnimationFrame(layout);
+			scatterCards();
 		}
 	});
 })();
