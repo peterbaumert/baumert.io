@@ -1,0 +1,19 @@
+name: Validate dev projects
+
+on:
+  pull_request:
+    paths:
+      - 'dev-projects/**'
+      - 'scripts/build_dev_projects.py'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - run: python3 scripts/build_dev_projects.py

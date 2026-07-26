@@ -1,0 +1,49 @@
+[
+  {
+    "name": "AdlerController",
+    "description": "Live broadcast graphics controller for Adler Mannheim (DEL ice hockey) — bridges an operator to vMix over TCP to trigger overlays and lower-thirds during games.",
+    "category": "private"
+  },
+  {
+    "name": "battlemap.wtf",
+    "description": "Pokémon GO live map and raid tracker with Telegram alerts (PHP/MySQL, Mapbox). No longer live — retired in 2021.",
+    "category": "private"
+  },
+  {
+    "name": "Infrastructure as Code",
+    "description": "Personal infrastructure — Kubernetes, virtualization, networking — managed as code with Terraform and Ansible.",
+    "category": "private"
+  },
+  {
+    "name": "netbox-device-view",
+    "description": "NetBox plugin rendering a device's physical ports and interfaces as a visual grid.",
+    "repoUrl": "https://github.com/peterbaumert/netbox-device-view",
+    "badges": {
+      "stars": true,
+      "version": true,
+      "ci": "test.yml"
+    },
+    "category": "public"
+  },
+  {
+    "name": "netbox-widget-chart",
+    "description": "Configurable chart dashboard widget for NetBox.",
+    "repoUrl": "https://github.com/peterbaumert/netbox-widget-chart",
+    "badges": {
+      "stars": true,
+      "version": true,
+      "ci": "ci.yml"
+    },
+    "category": "public"
+  },
+  {
+    "name": "streamdeck-vmix-plugin",
+    "description": "Stream Deck plugin to control vMix via its API.",
+    "repoUrl": "https://github.com/peterbaumert/streamdeck-vmix-plugin",
+    "badges": {
+      "stars": true,
+      "version": true
+    },
+    "category": "public"
+  }
+]

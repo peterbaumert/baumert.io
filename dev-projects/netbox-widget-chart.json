@@ -1,0 +1,11 @@
+{
+  "name": "netbox-widget-chart",
+  "description": "Configurable chart dashboard widget for NetBox.",
+  "category": "public",
+  "repoUrl": "https://github.com/peterbaumert/netbox-widget-chart",
+  "badges": {
+    "stars": true,
+    "version": true,
+    "ci": "ci.yml"
+  }
+}

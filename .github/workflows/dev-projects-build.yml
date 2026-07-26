@@ -1,0 +1,34 @@
+name: Build dev projects
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dev-projects/**'
+      - 'scripts/build_dev_projects.py'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - run: python3 scripts/build_dev_projects.py
+
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add js/dev-projects.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Regenerate dev-projects.json"
+            git push
+          fi
