@@ -117,6 +117,22 @@ body.ptz-active {
   gap: 48px;
 }
 
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-photo {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
 .name {
   font-size: 34px;
   font-weight: 700;
@@ -129,6 +145,36 @@ body.ptz-active {
   line-height: 1.6;
   color: var(--color-ink);
   margin: 0;
+}
+
+/* small gallery backing up the bio's roles with actual photos -- same
+   spacing pattern as .category-section on the Dev tab */
+.field-photos {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.field-photo-card {
+  margin: 0;
+}
+
+.field-photo-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: block;
+}
+
+.field-photo-card figcaption {
+  margin-top: 8px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--color-ink-muted);
+  text-align: center;
 }
 
 .facts {
@@ -519,6 +565,10 @@ body.ptz-active {
   }
 
   .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field-photos {
     grid-template-columns: 1fr;
   }
 
